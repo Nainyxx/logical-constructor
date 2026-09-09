@@ -10,7 +10,7 @@ export default function PaletteItem({ type }) {
 
   return (
     <div className="palette-item" draggable onDragStart={handleDragStart}>
-      <ElementGlyph type={type} width={56} height={type.kind === 'source' ? 28 : 36} on={false} />
+      <ElementGlyph type={type} width={84} height={58} on={false} />
       <span className="palette-item__label">{type.label}</span>
     </div>
   )

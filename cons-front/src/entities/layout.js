@@ -12,11 +12,11 @@ const PORT_STEP = 32
 const MIN_HEIGHT = 56
 
 export function getNodeSize(type) {
-  // У входа и выхода нет ряда портов, под который нужно расти в высоту —
-  // им хватает компактного размера тумблера/лампочки, а не полной
-  // ширины вентиля.
-  if (type.kind === 'source') return { width: 56, height: 28 }
-  if (type.kind === 'sink') return { width: 56, height: 44 }
+  // Высота входа и выхода равна минимальной высоте вентиля — на холсте
+  // все элементы должны читаться как один "весовой класс", а не
+  // теряться рядом с более крупными гейтами.
+  if (type.kind === 'source') return { width: 80, height: MIN_HEIGHT }
+  if (type.kind === 'sink') return { width: 64, height: MIN_HEIGHT }
   const height = Math.max(MIN_HEIGHT, type.inputCount * PORT_STEP + 16)
   return { width: NODE_WIDTH, height }
 }
