@@ -1,0 +1,322 @@
+:root {
+  --paper: #ffffff;
+  --grid-line: #e3e8ef;
+  --ink: #1f2430;
+  --muted: #6b7280;
+  --panel-bg: #f7f8fa;
+  --panel-border: #e3e6ea;
+  --node-border: #2b2f3a;
+  --node-bg: #ffffff;
+  --wire-off: #b7bec9;
+  --wire-on: #22c55e;
+  --danger: #ef4444;
+
+  color-scheme: light;
+  font: 15px/1.4 system-ui, 'Segoe UI', Roboto, sans-serif;
+  color: var(--ink);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  overflow: hidden;
+}
+
+#root {
+  height: 100vh;
+}
+
+.app {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.app__hint {
+  flex: none;
+  padding: 10px 16px;
+  font-size: 13px;
+  color: var(--muted);
+  background: var(--panel-bg);
+  border-bottom: 1px solid var(--panel-border);
+}
+
+/* ---------- рабочее поле ---------- */
+
+.workspace {
+  position: relative;
+  flex: 1;
+  overflow: hidden;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+
+.workspace:active {
+  cursor: grabbing;
+}
+
+.workspace__world {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: 0 0;
+}
+
+.workspace__grid {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-color: var(--paper);
+  background-image:
+    linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+.wires {
+  position: absolute;
+  top: 0;
+  left: 0;
+  overflow: visible;
+  pointer-events: none;
+}
+
+/* невидимая, но широкая полоса — по ней реально попадать курсором */
+.wire-hit {
+  fill: none;
+  stroke: transparent;
+  stroke-width: 18;
+  pointer-events: stroke;
+  cursor: pointer;
+}
+
+.wire-visible {
+  fill: none;
+  stroke: var(--wire-off);
+  stroke-width: 2.5;
+  pointer-events: none;
+  transition: stroke 0.1s, stroke-width 0.1s;
+}
+
+.wire-visible.is-live {
+  stroke: var(--wire-on);
+}
+
+.wire--draft {
+  stroke-dasharray: 6 5;
+}
+
+/* при наведении на "hit"-полосу подсвечиваем видимую линию и метку удаления */
+.wire-hit:hover + .wire-visible {
+  stroke: var(--danger);
+  stroke-width: 3.5;
+}
+
+.wire-marker {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.wire-hit:hover ~ .wire-marker {
+  opacity: 1;
+}
+
+.wire-marker circle {
+  fill: #fff;
+  stroke: var(--danger);
+  stroke-width: 2;
+}
+
+.wire-marker path {
+  stroke: var(--danger);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+}
+
+/* ---------- узел на поле ---------- */
+
+.node {
+  position: absolute;
+  cursor: grab;
+}
+
+.node:active {
+  cursor: grabbing;
+}
+
+.node__remove {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  width: 18px;
+  height: 18px;
+  line-height: 16px;
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid var(--panel-border);
+  background: #fff;
+  color: var(--muted);
+  font-size: 13px;
+  opacity: 0;
+  cursor: pointer;
+  transition: opacity 0.1s;
+}
+
+.node:hover .node__remove {
+  opacity: 1;
+}
+
+.node__remove:hover {
+  color: var(--danger);
+  border-color: var(--danger);
+}
+
+/* кликабельная зона порта — заметно больше видимой точки внутри неё */
+.port__hit {
+  position: absolute;
+  width: 28px;
+  height: 28px;
+  margin: -14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: crosshair;
+}
+
+.port__hit--out {
+  cursor: pointer;
+}
+
+.port__dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2px solid var(--wire-off);
+  pointer-events: none;
+  transition: transform 0.1s, border-color 0.1s;
+}
+
+.port__dot.is-live {
+  border-color: var(--wire-on);
+}
+
+.port__hit:hover .port__dot {
+  transform: scale(1.25);
+  border-color: var(--ink);
+}
+
+/* ---------- тело элемента (общее для палитры и узла) ---------- */
+
+.glyph {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.glyph--gate {
+  background: var(--node-bg);
+  border: 2px solid var(--node-border);
+  border-radius: 3px;
+}
+
+.glyph__symbol {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.glyph__bubble {
+  position: absolute;
+  right: -9px;
+  top: 50%;
+  width: 10px;
+  height: 10px;
+  transform: translateY(-50%);
+  border-radius: 50%;
+  border: 2px solid var(--node-border);
+  background: var(--paper);
+}
+
+.glyph--source {
+  background: var(--wire-off);
+  border-radius: 999px;
+  padding: 3px;
+  transition: background 0.15s;
+}
+
+.glyph--source.is-on {
+  background: var(--wire-on);
+}
+
+.glyph__knob {
+  width: 40%;
+  height: 100%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #fff;
+  margin-left: 0;
+  transition: margin-left 0.15s;
+}
+
+.glyph--source.is-on .glyph__knob {
+  margin-left: 55%;
+}
+
+.glyph--sink {
+  background: transparent;
+}
+
+.glyph__bulb {
+  width: 60%;
+  height: 60%;
+  border-radius: 50%;
+  border: 2px solid var(--node-border);
+  background: #fff;
+  transition: background 0.15s, box-shadow 0.15s;
+}
+
+.glyph__bulb.is-on {
+  background: var(--wire-on);
+  border-color: var(--wire-on);
+  box-shadow: 0 0 10px 2px rgba(34, 197, 94, 0.5);
+}
+
+/* ---------- нижняя панель (палитра) ---------- */
+
+.palette {
+  flex: none;
+  display: flex;
+  gap: 12px;
+  padding: 12px 16px;
+  background: var(--panel-bg);
+  border-top: 1px solid var(--panel-border);
+  overflow-x: auto;
+}
+
+.palette-item {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  width: 84px;
+  padding: 10px 8px;
+  border-radius: 8px;
+  background: #fff;
+  border: 1px solid var(--panel-border);
+  cursor: grab;
+}
+
+.palette-item:active {
+  cursor: grabbing;
+}
+
+.palette-item__label {
+  font-size: 12px;
+  color: var(--muted);
+}
