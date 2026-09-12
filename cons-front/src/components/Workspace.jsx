@@ -80,11 +80,11 @@ export default function Workspace({ nodes, wires, values, addNode, moveNode, rem
     }
   }
 
-  function handleWireStart(e, nodeId) {
+  function handleWireStart(e, nodeId, portIndex) {
     e.stopPropagation()
     const world = screenToWorld(e.clientX, e.clientY)
-    interactionRef.current = { type: 'wire', fromNodeId: nodeId }
-    setDraftWire({ fromNodeId: nodeId, x: world.x, y: world.y })
+    interactionRef.current = { type: 'wire', fromNodeId: nodeId, fromPort: portIndex }
+    setDraftWire({ fromNodeId: nodeId, fromPort: portIndex, x: world.x, y: world.y })
   }
 
   // --- продолжение и завершение жестов (слушатели на window,
@@ -125,7 +125,7 @@ export default function Workspace({ nodes, wires, values, addNode, moveNode, rem
 
       if (interaction.type === 'wire') {
         const target = findInputPortAt(e.clientX, e.clientY)
-        if (target) connect(interaction.fromNodeId, target.nodeId, target.portIndex)
+        if (target) connect(interaction.fromNodeId, interaction.fromPort, target.nodeId, target.portIndex)
         setDraftWire(null)
       }
 
@@ -191,7 +191,7 @@ export default function Workspace({ nodes, wires, values, addNode, moveNode, rem
           <ElementNode
             key={node.id}
             node={node}
-            on={values.get(node.id)}
+            value={values.get(node.id)}
             onStartMove={handleNodePointerDown}
             onStartWire={handleWireStart}
             onRemove={removeNode}

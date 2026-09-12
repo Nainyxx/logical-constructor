@@ -1,18 +1,46 @@
-import Palette from './components/Palette'
-import Workspace from './components/Workspace'
-import { useCircuitState } from './hooks/useCircuitState'
+import { useState } from 'react'
+import AuthGate from './components/AuthGate'
+import MainMenu from './components/MainMenu'
+import LabPlaceholder from './components/LabPlaceholder'
+import FreeMode from './components/FreeMode'
+
+const AUTH_KEY = 'constructor:user'
 
 export default function App() {
-  const circuit = useCircuitState()
+  const [user, setUser] = useState(() => localStorage.getItem(AUTH_KEY))
+  const [screen, setScreen] = useState({ name: 'menu' })
+
+  if (!user) {
+    return (
+      <AuthGate
+        onAuth={(login) => {
+          localStorage.setItem(AUTH_KEY, login)
+          setUser(login)
+        }}
+      />
+    )
+  }
+
+  function handleLogout() {
+    localStorage.removeItem(AUTH_KEY)
+    setUser(null)
+    setScreen({ name: 'menu' })
+  }
+
+  if (screen.name === 'lab') {
+    return <LabPlaceholder number={screen.number} onBack={() => setScreen({ name: 'menu' })} />
+  }
+
+  if (screen.name === 'free') {
+    return <FreeMode onBack={() => setScreen({ name: 'menu' })} />
+  }
 
   return (
-    <div className="app">
-      <header className="app__hint">
-        Перетащите элемент на поле снизу. Тяните от кружка справа (выход) к кружку слева (вход) —
-        так соединяются провода. Клик по проводу удаляет его, клик по «Входу» переключает 0/1.
-      </header>
-      <Workspace {...circuit} />
-      <Palette />
-    </div>
+    <MainMenu
+      user={user}
+      onOpenLab={(number) => setScreen({ name: 'lab', number })}
+      onOpenFree={() => setScreen({ name: 'free' })}
+      onLogout={handleLogout}
+    />
   )
 }

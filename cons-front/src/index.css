@@ -10,6 +10,9 @@
   --wire-off: #b7bec9;
   --wire-on: #22c55e;
   --danger: #ef4444;
+  --accent: #2f6fed;
+  --accent-hover: #255bc7;
+  --surface: #ffffff;
 
   color-scheme: light;
   font: 15px/1.4 system-ui, 'Segoe UI', Roboto, sans-serif;
@@ -35,13 +38,362 @@ body {
   flex-direction: column;
 }
 
-.app__hint {
+.app__topbar {
   flex: none;
-  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 20px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--panel-border);
+}
+
+.app__title {
+  margin: 0;
+  font-size: 16px;
+}
+
+.app__topbar-actions {
+  display: flex;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.app__hint {
+  position: relative;
+  flex: none;
+  margin: 0;
+  padding: 10px 40px 10px 16px;
   font-size: 13px;
   color: var(--muted);
   background: var(--panel-bg);
   border-bottom: 1px solid var(--panel-border);
+}
+
+.app__hint-close {
+  position: absolute;
+  top: 6px;
+  right: 10px;
+  width: 22px;
+  height: 22px;
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.app__hint-close:hover {
+  background: var(--panel-border);
+  color: var(--ink);
+}
+
+/* ---------- кнопки (общие) ---------- */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 9px 16px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  font: inherit;
+  font-weight: 500;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.12s, border-color 0.12s, color 0.12s;
+}
+
+.btn--primary {
+  background: var(--accent);
+  color: #fff;
+}
+
+.btn--primary:hover {
+  background: var(--accent-hover);
+}
+
+.btn--ghost {
+  background: transparent;
+  border-color: var(--panel-border);
+  color: var(--ink);
+}
+
+.btn--ghost:hover {
+  border-color: var(--node-border);
+}
+
+/* ---------- вход / регистрация ---------- */
+
+.auth-overlay {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--panel-bg);
+  background-image:
+    linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+.auth-modal {
+  width: 470px;
+  padding: 36px;
+  background: var(--surface);
+  border: 1px solid var(--panel-border);
+  border-radius: 16px;
+  box-shadow: 0 20px 40px -20px rgba(31, 36, 48, 0.25);
+}
+
+.auth-modal__brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 26px;
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.auth-modal__logo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 9px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.auth-modal__tabs {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  margin-bottom: 20px;
+  background: var(--panel-bg);
+  border-radius: 9px;
+}
+
+.auth-modal__tabs button {
+  flex: 1;
+  padding: 8px 0;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.auth-modal__tabs button.is-active {
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: 0 1px 2px rgba(31, 36, 48, 0.12);
+}
+
+.auth-modal__form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.auth-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.auth-field input {
+  padding: 12px 14px;
+  border: 1px solid var(--panel-border);
+  border-radius: 8px;
+  font: inherit;
+  color: var(--ink);
+}
+
+.auth-field input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.auth-modal__error {
+  margin: 0;
+  font-size: 13px;
+  color: var(--danger);
+}
+
+.auth-modal__submit {
+  width: 100%;
+  margin-top: 6px;
+  padding: 13px 16px;
+  font-size: 15px;
+}
+
+.auth-modal__hint {
+  margin: 18px 0 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--muted);
+  text-align: center;
+}
+
+/* ---------- меню лаб ---------- */
+
+.menu {
+  height: 100%;
+  overflow-y: auto;
+  padding: 40px 48px;
+  background: var(--panel-bg);
+}
+
+.menu__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  max-width: 1080px;
+  margin: 0 auto 28px;
+}
+
+.menu__header h1 {
+  margin: 0 0 6px;
+  font-size: 28px;
+}
+
+.menu__header p {
+  margin: 0;
+  max-width: 520px;
+  color: var(--muted);
+}
+
+.menu__account {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: none;
+}
+
+.menu__user {
+  font-weight: 500;
+}
+
+.menu__grid {
+  display: flex;
+  align-items: stretch;
+  gap: 16px;
+  max-width: 1080px;
+  margin: 0 auto;
+}
+
+.menu__labs {
+  flex: 2.2;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.lab-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  width: 100%;
+  padding: 20px;
+  background: var(--surface);
+  border: 1px solid var(--panel-border);
+  border-radius: 12px;
+  text-align: left;
+  font: inherit;
+  color: var(--ink);
+  cursor: pointer;
+  transition: border-color 0.12s, box-shadow 0.12s;
+}
+
+.lab-card:hover {
+  border-color: var(--accent);
+  box-shadow: 0 8px 20px -14px rgba(47, 111, 237, 0.5);
+}
+
+.lab-card h2 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.lab-card p {
+  margin: 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.lab-card__badge {
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: var(--panel-bg);
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.lab-card__badge--accent {
+  background: rgba(47, 111, 237, 0.12);
+  color: var(--accent);
+}
+
+.lab-card--free {
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  border-color: var(--accent);
+}
+
+/* ---------- заглушка лабы ---------- */
+
+.stub {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--panel-bg);
+}
+
+.stub__back {
+  margin: 20px;
+  align-self: flex-start;
+}
+
+.stub__body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  text-align: center;
+  color: var(--muted);
+}
+
+.stub__body h1 {
+  margin: 0;
+  color: var(--ink);
+}
+
+.stub__badge {
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: rgba(47, 111, 237, 0.12);
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 600;
 }
 
 /* ---------- рабочее поле ---------- */
@@ -242,48 +594,139 @@ body {
   background: var(--paper);
 }
 
-.glyph--source {
-  background: var(--wire-off);
+/* тумблер входа — фиксированный размер, не зависит от узла, поэтому
+   не растягивается в эллипс */
+.switch-track {
+  position: relative;
+  display: block;
+  width: 64px;
+  height: 34px;
   border-radius: 999px;
-  padding: 3px;
+  background: var(--wire-off);
   transition: background 0.15s;
 }
 
-.glyph--source.is-on {
+.switch-track.is-on {
   background: var(--wire-on);
 }
 
-.glyph__knob {
-  width: 40%;
-  height: 100%;
-  aspect-ratio: 1;
+.switch-knob {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: 26px;
+  height: 26px;
   border-radius: 50%;
   background: #fff;
-  margin-left: 0;
-  transition: margin-left 0.15s;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  transition: transform 0.15s;
 }
 
-.glyph--source.is-on .glyph__knob {
-  margin-left: 55%;
+.switch-track.is-on .switch-knob {
+  transform: translateX(30px);
 }
 
-.glyph--sink {
-  background: transparent;
-}
-
-.glyph__bulb {
-  width: 60%;
-  height: 60%;
+/* лампа выхода — кружок правильной формы с крестом-нитью накала,
+   вместо растянутого эллипса */
+.lamp {
+  position: relative;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
   border: 2px solid var(--node-border);
   background: #fff;
-  transition: background 0.15s, box-shadow 0.15s;
+  transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
 }
 
-.glyph__bulb.is-on {
+.lamp::before,
+.lamp::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 18%;
+  width: 64%;
+  height: 2px;
+  background: var(--node-border);
+  transition: background 0.15s;
+}
+
+.lamp::before {
+  transform: translateY(-50%) rotate(45deg);
+}
+
+.lamp::after {
+  transform: translateY(-50%) rotate(-45deg);
+}
+
+.lamp.is-on {
   background: var(--wire-on);
   border-color: var(--wire-on);
   box-shadow: 0 0 10px 2px rgba(34, 197, 94, 0.5);
+}
+
+.lamp.is-on::before,
+.lamp.is-on::after {
+  background: #fff;
+}
+
+/* подписи над/под вентилем: имя элемента и текущий сигнал на выходе */
+.node__label {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  pointer-events: none;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.node__label--top {
+  top: -20px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.node__label--bottom {
+  bottom: -22px;
+}
+
+.node__value {
+  display: inline-block;
+  min-width: 16px;
+  padding: 1px 5px;
+  border-radius: 3px;
+  border: 1px solid var(--panel-border);
+  background: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+}
+
+.node__value.is-on {
+  color: var(--wire-on);
+  border-color: var(--wire-on);
+}
+
+/* подписи возле портов многовходовых/многовыходных элементов
+   (S/R у триггера, Y0..Y3 у дешифратора и т.п.) */
+.node__port-label {
+  position: absolute;
+  font-size: 9px;
+  font-weight: 600;
+  color: var(--muted);
+  pointer-events: none;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.node__port-label--in {
+  transform: translate(6px, -50%);
+}
+
+.node__port-label--out {
+  transform: translate(calc(-100% - 6px), -50%);
 }
 
 /* ---------- нижняя панель (палитра) ---------- */
@@ -291,8 +734,9 @@ body {
 .palette {
   flex: none;
   display: flex;
-  gap: 12px;
-  padding: 12px 16px;
+  align-items: center;
+  gap: 24px;
+  padding: 26px 28px;
   background: var(--panel-bg);
   border-top: 1px solid var(--panel-border);
   overflow-x: auto;
@@ -303,13 +747,19 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
-  width: 84px;
-  padding: 10px 8px;
-  border-radius: 8px;
+  justify-content: center;
+  gap: 12px;
+  width: 148px;
+  height: 128px;
+  padding: 16px;
+  border-radius: 12px;
   background: #fff;
   border: 1px solid var(--panel-border);
   cursor: grab;
+}
+
+.palette-item:hover {
+  border-color: var(--node-border);
 }
 
 .palette-item:active {
@@ -317,6 +767,13 @@ body {
 }
 
 .palette-item__label {
-  font-size: 12px;
-  color: var(--muted);
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--ink);
+}
+
+/* превью в палитре крупнее самих узлов на холсте — увеличиваем только
+   в этой области, не трогая базовые классы, общие с ElementNode */
+.palette-item .glyph__symbol {
+  font-size: 20px;
 }
