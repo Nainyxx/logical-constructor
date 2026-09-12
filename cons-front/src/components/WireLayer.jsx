@@ -9,10 +9,10 @@ import { WORLD_SIZE, getInputPortPosition, getOutputPortPosition } from '../enti
 export default function WireLayer({ nodes, wires, values, draftWire, onDeleteWire }) {
   const nodeById = new Map(nodes.map((node) => [node.id, node]))
 
-  function outputPoint(nodeId) {
+  function outputPoint(nodeId, portIndex = 0) {
     const node = nodeById.get(nodeId)
     if (!node) return null
-    const pos = getOutputPortPosition(node.type)
+    const pos = getOutputPortPosition(node.type, portIndex)
     return { x: node.x + pos.x, y: node.y + pos.y }
   }
 
@@ -46,10 +46,10 @@ export default function WireLayer({ nodes, wires, values, draftWire, onDeleteWir
   return (
     <svg className="wires" width={WORLD_SIZE} height={WORLD_SIZE}>
       {wires.map((wire) => {
-        const from = outputPoint(wire.fromNodeId)
+        const from = outputPoint(wire.fromNodeId, wire.fromPort ?? 0)
         const to = inputPoint(wire.toNodeId, wire.toPort)
         if (!from || !to) return null
-        const live = values.get(wire.fromNodeId)
+        const live = values.get(wire.fromNodeId)?.outputs?.[wire.fromPort ?? 0]
         const mid = curveMidpoint(from, to)
 
         return (
@@ -73,7 +73,7 @@ export default function WireLayer({ nodes, wires, values, draftWire, onDeleteWir
 
       {draftWire &&
         (() => {
-          const from = outputPoint(draftWire.fromNodeId)
+          const from = outputPoint(draftWire.fromNodeId, draftWire.fromPort ?? 0)
           if (!from) return null
           return <path d={curvePath(from, draftWire)} className="wire-visible wire--draft" />
         })()}

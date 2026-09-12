@@ -25,6 +25,8 @@ export default function ElementGlyph({ type, width, height, on }) {
     )
   }
 
+  // 'gate' и 'memory' рисуются одинаково — прямоугольник с символом;
+  // разница между ними в наличии состояния, а не во внешнем виде.
   return (
     <div className="glyph glyph--gate" style={{ width, height }}>
       <span className="glyph__symbol">{type.symbol}</span>

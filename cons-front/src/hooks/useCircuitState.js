@@ -1,9 +1,17 @@
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { ELEMENT_TYPES } from '../entities/elementTypes'
 import { evaluateCircuit } from '../entities/circuit'
 
 let nextId = 1
 const makeId = (prefix) => `${prefix}-${nextId++}`
+
+function statesEqual(a, b) {
+  if (a === b) return true
+  if (!a || !b) return false
+  const keys = Object.keys(a)
+  if (keys.length !== Object.keys(b).length) return false
+  return keys.every((key) => a[key] === b[key])
+}
 
 /**
  * Хранит состояние схемы (узлы + провода) и даёт действия для его
@@ -16,7 +24,8 @@ export function useCircuitState() {
 
   const addNode = useCallback((typeId, x, y) => {
     const id = makeId(typeId)
-    setNodes((prev) => [...prev, { id, typeId, x, y, on: false }])
+    const state = ELEMENT_TYPES[typeId].initialState?.() ?? null
+    setNodes((prev) => [...prev, { id, typeId, x, y, on: false, state }])
     return id
   }, [])
 
@@ -35,11 +44,11 @@ export function useCircuitState() {
 
   // Один вход может принять только один провод — новое соединение
   // вытесняет старое, если оно было в этот же порт.
-  const connect = useCallback((fromNodeId, toNodeId, toPort) => {
+  const connect = useCallback((fromNodeId, fromPort, toNodeId, toPort) => {
     if (fromNodeId === toNodeId) return
     setWires((prev) => [
       ...prev.filter((wire) => !(wire.toNodeId === toNodeId && wire.toPort === toPort)),
-      { id: makeId('wire'), fromNodeId, toNodeId, toPort },
+      { id: makeId('wire'), fromNodeId, fromPort, toNodeId, toPort },
     ])
   }, [])
 
@@ -52,7 +61,28 @@ export function useCircuitState() {
     setWires([])
   }, [])
 
-  const values = useMemo(() => evaluateCircuit(nodes, wires), [nodes, wires])
+  const { values, nextStates } = useMemo(() => evaluateCircuit(nodes, wires), [nodes, wires])
+
+  // Триггеры и ячейки памяти хранят своё состояние в самом узле, а не
+  // выводят его заново из текущих входов. Как только вычисленное
+  // состояние отличается от сохранённого, переносим его в узел — это и
+  // есть следующий "такт" схемы (как в реальной защёлке, реагирующей на
+  // изменение входов). Сравнение перед записью не даёт зациклиться:
+  // когда состояние уже совпадает, повторный рендер не запускается.
+  useEffect(() => {
+    if (nextStates.size === 0) return
+    setNodes((prev) => {
+      let changed = false
+      const updated = prev.map((node) => {
+        if (!nextStates.has(node.id)) return node
+        const nextState = nextStates.get(node.id)
+        if (statesEqual(node.state, nextState)) return node
+        changed = true
+        return { ...node, state: nextState }
+      })
+      return changed ? updated : prev
+    })
+  }, [nextStates])
 
   const nodesWithType = useMemo(
     () => nodes.map((node) => ({ ...node, type: ELEMENT_TYPES[node.typeId] })),

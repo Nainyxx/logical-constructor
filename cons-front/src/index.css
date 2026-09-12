@@ -709,6 +709,26 @@ body {
   border-color: var(--wire-on);
 }
 
+/* подписи возле портов многовходовых/многовыходных элементов
+   (S/R у триггера, Y0..Y3 у дешифратора и т.п.) */
+.node__port-label {
+  position: absolute;
+  font-size: 9px;
+  font-weight: 600;
+  color: var(--muted);
+  pointer-events: none;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.node__port-label--in {
+  transform: translate(6px, -50%);
+}
+
+.node__port-label--out {
+  transform: translate(calc(-100% - 6px), -50%);
+}
+
 /* ---------- нижняя панель (палитра) ---------- */
 
 .palette {

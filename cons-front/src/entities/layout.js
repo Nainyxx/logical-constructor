@@ -17,8 +17,13 @@ export function getNodeSize(type) {
   // теряться рядом с более крупными гейтами.
   if (type.kind === 'source') return { width: 80, height: MIN_HEIGHT }
   if (type.kind === 'sink') return { width: 64, height: MIN_HEIGHT }
-  const height = Math.max(MIN_HEIGHT, type.inputCount * PORT_STEP + 16)
-  return { width: NODE_WIDTH, height }
+  const ports = Math.max(type.inputCount, type.outputCount ?? 1)
+  const height = Math.max(MIN_HEIGHT, ports * PORT_STEP + 16)
+  // Элементам с подписанными входами/выходами (шифратор, триггер и т.п.)
+  // нужно больше места по ширине, чтобы подписи не наезжали на символ.
+  const hasLabels = Boolean(type.inputLabels || type.outputLabels)
+  const width = hasLabels ? NODE_WIDTH + 40 : NODE_WIDTH
+  return { width, height }
 }
 
 export function getInputPortPosition(type, portIndex) {
@@ -27,7 +32,10 @@ export function getInputPortPosition(type, portIndex) {
   return { x: 0, y: slot * (portIndex + 1) }
 }
 
-export function getOutputPortPosition(type) {
+export function getOutputPortPosition(type, portIndex = 0) {
   const { width, height } = getNodeSize(type)
-  return { x: width, y: height / 2 }
+  const count = type.outputCount ?? 1
+  if (count <= 1) return { x: width, y: height / 2 }
+  const slot = height / (count + 1)
+  return { x: width, y: slot * (portIndex + 1) }
 }
