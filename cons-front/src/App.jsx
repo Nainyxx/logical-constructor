@@ -1,34 +1,16 @@
 import { useState } from 'react'
-import AuthGate from './components/AuthGate'
 import MainMenu from './components/MainMenu'
-import LabPlaceholder from './components/LabPlaceholder'
+import LabWorkspace from './components/LabWorkspace'
 import FreeMode from './components/FreeMode'
 
-const AUTH_KEY = 'constructor:user'
-
+// Три экрана приложения: каталог работ, конкретная лабораторная работа
+// и свободный режим. Роутинг — просто локальный стейт, бэкенда и
+// авторизации нет: это учебный тренажёр, открытый для всех.
 export default function App() {
-  const [user, setUser] = useState(() => localStorage.getItem(AUTH_KEY))
   const [screen, setScreen] = useState({ name: 'menu' })
 
-  if (!user) {
-    return (
-      <AuthGate
-        onAuth={(login) => {
-          localStorage.setItem(AUTH_KEY, login)
-          setUser(login)
-        }}
-      />
-    )
-  }
-
-  function handleLogout() {
-    localStorage.removeItem(AUTH_KEY)
-    setUser(null)
-    setScreen({ name: 'menu' })
-  }
-
   if (screen.name === 'lab') {
-    return <LabPlaceholder number={screen.number} onBack={() => setScreen({ name: 'menu' })} />
+    return <LabWorkspace number={screen.number} onBack={() => setScreen({ name: 'menu' })} />
   }
 
   if (screen.name === 'free') {
@@ -37,10 +19,8 @@ export default function App() {
 
   return (
     <MainMenu
-      user={user}
       onOpenLab={(number) => setScreen({ name: 'lab', number })}
       onOpenFree={() => setScreen({ name: 'free' })}
-      onLogout={handleLogout}
     />
   )
 }
