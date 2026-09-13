@@ -16,9 +16,11 @@ export const ELEMENT_KIND = {
 //                          (триггеру нужно помнить прошлое значение,
 //                          а не только текущие входы).
 //
-// shape задаёт, каким классическим значком рисовать вентиль (см.
-// components/GateShape.jsx) — так внешний вид на холсте совпадает с тем,
-// что показано в методичке лабораторной работы.
+// symbol — буквенное обозначение внутри прямоугольника по ГОСТ 2.743-91
+// (см. components/GateShape.jsx): «&» — И, «≥1» — ИЛИ, «1» — НЕ/повторитель,
+// «=1» — Исключающее ИЛИ. negated добавляет кружок инверсии на выходе —
+// так один и тот же прямоугольник с «&» обслуживает и И, и И-НЕ. Именно
+// в таком виде вентили нарисованы в методичках лабораторных работ.
 
 export const ELEMENT_TYPES = {
   INPUT: {
@@ -42,7 +44,8 @@ export const ELEMENT_TYPES = {
     kind: ELEMENT_KIND.GATE,
     label: 'НЕ',
     description: 'Инвертор — меняет сигнал на противоположный',
-    shape: 'not',
+    symbol: '1',
+    negated: true,
     formula: 'Y = ¬A',
     inputCount: 1,
     outputCount: 1,
@@ -53,7 +56,7 @@ export const ELEMENT_TYPES = {
     kind: ELEMENT_KIND.GATE,
     label: 'И',
     description: 'Конъюнкция — единица, только если все входы равны 1',
-    shape: 'and',
+    symbol: '&',
     formula: 'Y = A ∧ B',
     inputCount: 2,
     outputCount: 1,
@@ -64,7 +67,7 @@ export const ELEMENT_TYPES = {
     kind: ELEMENT_KIND.GATE,
     label: 'ИЛИ',
     description: 'Дизъюнкция — единица, если хотя бы один вход равен 1',
-    shape: 'or',
+    symbol: '≥1',
     formula: 'Y = A ∨ B',
     inputCount: 2,
     outputCount: 1,
@@ -75,7 +78,7 @@ export const ELEMENT_TYPES = {
     kind: ELEMENT_KIND.GATE,
     label: 'Искл. ИЛИ',
     description: 'Сложение по модулю 2 — единица, если входы различны',
-    shape: 'xor',
+    symbol: '=1',
     formula: 'Y = A ⊕ B',
     inputCount: 2,
     outputCount: 1,
@@ -86,7 +89,7 @@ export const ELEMENT_TYPES = {
     kind: ELEMENT_KIND.GATE,
     label: 'И-НЕ',
     description: 'Штрих Шеффера — инверсия элемента «И»',
-    shape: 'and',
+    symbol: '&',
     negated: true,
     formula: 'Y = ¬(A ∧ B)',
     inputCount: 2,
@@ -98,7 +101,7 @@ export const ELEMENT_TYPES = {
     kind: ELEMENT_KIND.GATE,
     label: 'ИЛИ-НЕ',
     description: 'Стрелка Пирса — инверсия элемента «ИЛИ»',
-    shape: 'or',
+    symbol: '≥1',
     negated: true,
     formula: 'Y = ¬(A ∨ B)',
     inputCount: 2,
@@ -110,7 +113,7 @@ export const ELEMENT_TYPES = {
     kind: ELEMENT_KIND.GATE,
     label: 'Равнозначность',
     description: 'Инверсия «Искл. ИЛИ» — единица, если входы совпадают',
-    shape: 'xor',
+    symbol: '=1',
     negated: true,
     formula: 'Y = ¬(A ⊕ B)',
     inputCount: 2,

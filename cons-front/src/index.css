@@ -355,8 +355,8 @@ button {
 
 .library-item__glyph {
   flex: none;
-  width: 44px;
-  height: 32px;
+  width: 60px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -921,12 +921,14 @@ button {
   fill: #fff;
   stroke: var(--node-border);
   stroke-width: 2;
-  stroke-linejoin: round;
-  stroke-linecap: round;
 }
 
-.gate-shape__body--line {
-  fill: none;
+.gate-shape__text {
+  fill: var(--node-border);
+  font-size: 14px;
+  font-weight: 700;
+  text-anchor: middle;
+  dominant-baseline: central;
 }
 
 .gate-shape__bubble {

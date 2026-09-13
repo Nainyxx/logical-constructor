@@ -13,9 +13,9 @@ export const WORLD_SIZE = 6000
 const SIZE_BY_KEY = {
   source: { width: 72, height: 36 },
   sink: { width: 56, height: 56 },
-  NOT: { width: 56, height: 36 },
+  NOT: { width: 60, height: 36 },
   memory: { width: 104, height: 72 },
-  gate2: { width: 64, height: 44 },
+  gate2: { width: 72, height: 44 },
 }
 
 export function getNodeSize(type) {

@@ -30,7 +30,7 @@ function LibraryItem({ type }) {
   return (
     <div className="library-item" draggable onDragStart={handleDragStart}>
       <div className="library-item__glyph">
-        <ElementGlyph type={type} width={40} height={type.kind === 'memory' ? 32 : 28} on={false} />
+        <ElementGlyph type={type} width={56} height={type.kind === 'memory' ? 36 : 32} on={false} />
       </div>
       <div className="library-item__text">
         <span className="library-item__label">{type.label}</span>
