@@ -1,7 +1,8 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import ElementNode from './ElementNode'
 import WireLayer from './WireLayer'
-import { NODE_WIDTH, WORLD_SIZE } from '../entities/layout'
+import { ELEMENT_TYPES } from '../entities/elementTypes'
+import { WORLD_SIZE, getNodeSize } from '../entities/layout'
 
 const MIN_SCALE = 0.4
 const MAX_SCALE = 2.5
@@ -17,7 +18,19 @@ const CLICK_THRESHOLD = 4 // px — меньше — считаем это кл�
  * Всё это — разные фазы одного и того же жеста "нажал — потянул —
  * отпустил", поэтому они собраны в один reducer-подобный interactionRef.
  */
-export default function Workspace({ nodes, wires, values, addNode, moveNode, removeNode, toggleInput, connect, removeWire }) {
+export default function Workspace({
+  nodes,
+  wires,
+  values,
+  addNode,
+  moveNode,
+  removeNode,
+  toggleInput,
+  renameNode,
+  connect,
+  removeWire,
+  clear,
+}) {
   const containerRef = useRef(null)
   const interactionRef = useRef(null)
   const [view, setView] = useState({ x: 0, y: 0, scale: 1 })
@@ -47,12 +60,30 @@ export default function Workspace({ nodes, wires, values, addNode, moveNode, rem
     }
   }
 
+  // На компактных вентилях с двумя входами кликабельные зоны соседних
+  // портов (увеличенные — см. .port__hit) перекрываются сильнее, чем
+  // расстояние между самими портами. Поэтому среди всех входов под
+  // курсором берём не первый попавшийся в DOM, а тот, чей центр
+  // физически ближе всего к точке отпускания.
   function findInputPortAt(clientX, clientY) {
-    const el = document
+    const candidates = document
       .elementsFromPoint(clientX, clientY)
-      .find((el) => el.dataset?.portDir === 'in')
-    if (!el) return null
-    return { nodeId: el.dataset.portNode, portIndex: Number(el.dataset.portIndex) }
+      .filter((el) => el.dataset?.portDir === 'in')
+    if (candidates.length === 0) return null
+
+    let best = null
+    let bestDistance = Infinity
+    for (const el of candidates) {
+      const rect = el.getBoundingClientRect()
+      const dx = rect.left + rect.width / 2 - clientX
+      const dy = rect.top + rect.height / 2 - clientY
+      const distance = dx * dx + dy * dy
+      if (distance < bestDistance) {
+        bestDistance = distance
+        best = el
+      }
+    }
+    return { nodeId: best.dataset.portNode, portIndex: Number(best.dataset.portIndex) }
   }
 
   // --- начало жестов -------------------------------------------------
@@ -161,6 +192,46 @@ export default function Workspace({ nodes, wires, values, addNode, moveNode, rem
     return () => el.removeEventListener('wheel', handleWheel)
   }, [])
 
+  // --- инструменты снизу: зум, вписать схему, очистить -----------------
+
+  function zoomBy(factor) {
+    const rect = containerRef.current.getBoundingClientRect()
+    setView((v) => {
+      const nextScale = Math.min(MAX_SCALE, Math.max(MIN_SCALE, v.scale * factor))
+      const cx = rect.width / 2
+      const cy = rect.height / 2
+      const worldX = (cx - v.x) / v.scale
+      const worldY = (cy - v.y) / v.scale
+      return { scale: nextScale, x: cx - worldX * nextScale, y: cy - worldY * nextScale }
+    })
+  }
+
+  function fitToView() {
+    const rect = containerRef.current.getBoundingClientRect()
+    if (nodes.length === 0) {
+      setView({ x: rect.width / 2 - WORLD_SIZE / 2, y: rect.height / 2 - WORLD_SIZE / 2, scale: 1 })
+      return
+    }
+    const PADDING = 80
+    let minX = Infinity
+    let minY = Infinity
+    let maxX = -Infinity
+    let maxY = -Infinity
+    nodes.forEach((node) => {
+      const size = getNodeSize(node.type)
+      minX = Math.min(minX, node.x)
+      minY = Math.min(minY, node.y)
+      maxX = Math.max(maxX, node.x + size.width)
+      maxY = Math.max(maxY, node.y + size.height)
+    })
+    const spanX = maxX - minX + PADDING * 2
+    const spanY = maxY - minY + PADDING * 2
+    const scale = Math.min(MAX_SCALE, Math.max(MIN_SCALE, Math.min(rect.width / spanX, rect.height / spanY)))
+    const midX = (minX + maxX) / 2
+    const midY = (minY + maxY) / 2
+    setView({ x: rect.width / 2 - midX * scale, y: rect.height / 2 - midY * scale, scale })
+  }
+
   // --- перетаскивание элементов из палитры ---------------------------
 
   function handleDrop(e) {
@@ -168,35 +239,64 @@ export default function Workspace({ nodes, wires, values, addNode, moveNode, rem
     const typeId = e.dataTransfer.getData('text/x-element-type')
     if (!typeId) return
     const world = screenToWorld(e.clientX, e.clientY)
-    addNode(typeId, world.x - NODE_WIDTH / 2, world.y - 20)
+    const size = getNodeSize(ELEMENT_TYPES[typeId])
+    addNode(typeId, world.x - size.width / 2, world.y - size.height / 2)
   }
 
+  const status =
+    nodes.length === 0 ? 'Разместите элементы' : wires.length === 0 ? 'Соедините элементы' : 'Схема собрана'
+
   return (
-    <div
-      ref={containerRef}
-      className="workspace"
-      onPointerDown={handleBackgroundPointerDown}
-      onDragOver={(e) => e.preventDefault()}
-      onDrop={handleDrop}
-    >
+    <div className="workspace-shell">
       <div
-        className="workspace__world"
-        style={{ transform: `translate(${view.x}px, ${view.y}px) scale(${view.scale})` }}
+        ref={containerRef}
+        className="workspace"
+        onPointerDown={handleBackgroundPointerDown}
+        onDragOver={(e) => e.preventDefault()}
+        onDrop={handleDrop}
       >
-        <div className="workspace__grid" style={{ width: WORLD_SIZE, height: WORLD_SIZE }} />
+        <div
+          className="workspace__world"
+          style={{ transform: `translate(${view.x}px, ${view.y}px) scale(${view.scale})` }}
+        >
+          <div className="workspace__grid" style={{ width: WORLD_SIZE, height: WORLD_SIZE }} />
 
-        <WireLayer nodes={nodes} wires={wires} values={values} draftWire={draftWire} onDeleteWire={removeWire} />
+          <WireLayer nodes={nodes} wires={wires} values={values} draftWire={draftWire} onDeleteWire={removeWire} />
 
-        {nodes.map((node) => (
-          <ElementNode
-            key={node.id}
-            node={node}
-            value={values.get(node.id)}
-            onStartMove={handleNodePointerDown}
-            onStartWire={handleWireStart}
-            onRemove={removeNode}
-          />
-        ))}
+          {nodes.map((node) => (
+            <ElementNode
+              key={node.id}
+              node={node}
+              value={values.get(node.id)}
+              onStartMove={handleNodePointerDown}
+              onStartWire={handleWireStart}
+              onRemove={removeNode}
+              onRename={renameNode}
+            />
+          ))}
+        </div>
+      </div>
+
+      <div className="workspace__toolbar">
+        <div className="workspace__zoom">
+          <button type="button" title="Уменьшить" onClick={() => zoomBy(1 / 1.25)}>
+            −
+          </button>
+          <span>{Math.round(view.scale * 100)}%</span>
+          <button type="button" title="Увеличить" onClick={() => zoomBy(1.25)}>
+            +
+          </button>
+        </div>
+        <button type="button" className="workspace__toolbar-btn" onClick={fitToView}>
+          Показать всю схему
+        </button>
+        <button type="button" className="workspace__toolbar-btn" onClick={clear}>
+          Очистить поле
+        </button>
+        <span className={`workspace__status ${wires.length > 0 ? 'is-ready' : ''}`}>
+          <span className="workspace__status-dot" />
+          {status}
+        </span>
       </div>
     </div>
   )

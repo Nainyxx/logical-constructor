@@ -1,19 +1,19 @@
-import { Fragment } from 'react'
+import { Fragment, useState } from 'react'
 import ElementGlyph from './ElementGlyph'
 import Port from './Port'
 import { getInputPortPosition, getNodeSize, getOutputPortPosition } from '../entities/layout'
 
-// Один элемент, размещённый на холсте: тело + его порты.
+// Один элемент, размещённый на холсте: тело + его порты + подписи.
 // Перетаскивание и подключение проводов обрабатывает Workspace —
 // узел только сообщает о начале жеста.
-export default function ElementNode({ node, value, onStartMove, onStartWire, onRemove }) {
+export default function ElementNode({ node, value, onStartMove, onStartWire, onRemove, onRename }) {
   const { type } = node
   const size = getNodeSize(type)
   const outputs = value?.outputs ?? []
-  const showName = type.kind === 'gate' || type.kind === 'memory'
-  // Одно число под вентилем имеет смысл только при одном выходе —
-  // у шифратора/дешифратора/триггера значение видно по точкам портов.
-  const showValueBadge = showName && (type.outputCount ?? 1) <= 1
+  const nameable = type.kind === 'source' || type.kind === 'sink'
+  // Единственное число под вентилем — только когда выход один: у
+  // триггера/шифратора значение видно по цвету самих портов.
+  const showValueBadge = type.kind === 'gate'
 
   return (
     <div
@@ -21,7 +21,9 @@ export default function ElementNode({ node, value, onStartMove, onStartWire, onR
       style={{ left: node.x, top: node.y, width: size.width, height: size.height }}
       onPointerDown={(e) => onStartMove(e, node)}
     >
-      {showName && <div className="node__label node__label--top">{type.label}</div>}
+      {nameable && (
+        <NodeName value={node.label} placeholder={type.kind === 'source' ? 'A' : 'F'} onCommit={(v) => onRename(node.id, v)} />
+      )}
 
       <ElementGlyph type={type} width={size.width} height={size.height} on={value?.display} />
 
@@ -38,10 +40,7 @@ export default function ElementNode({ node, value, onStartMove, onStartWire, onR
           <Fragment key={`in-${i}`}>
             <Port nodeId={node.id} index={i} direction="in" x={pos.x} y={pos.y} />
             {label && (
-              <span
-                className="node__port-label node__port-label--in"
-                style={{ left: pos.x, top: pos.y }}
-              >
+              <span className="node__port-label node__port-label--in" style={{ left: pos.x, top: pos.y }}>
                 {label}
               </span>
             )}
@@ -64,10 +63,7 @@ export default function ElementNode({ node, value, onStartMove, onStartWire, onR
               onStartWire={onStartWire}
             />
             {label && (
-              <span
-                className="node__port-label node__port-label--out"
-                style={{ left: pos.x, top: pos.y }}
-              >
+              <span className="node__port-label node__port-label--out" style={{ left: pos.x, top: pos.y }}>
                 {label}
               </span>
             )}
@@ -84,5 +80,52 @@ export default function ElementNode({ node, value, onStartMove, onStartWire, onR
         ×
       </button>
     </div>
+  )
+}
+
+// Имя входа/выхода (A, B, F…) — по умолчанию подставляется автоматически,
+// но лабораторные работы часто требуют конкретное имя (S, P, Q0…), поэтому
+// подпись можно переименовать прямым кликом.
+function NodeName({ value, placeholder, onCommit }) {
+  const [editing, setEditing] = useState(false)
+  const [draft, setDraft] = useState(value)
+
+  if (editing) {
+    return (
+      <input
+        className="node__label node__label--top node__name-input"
+        autoFocus
+        value={draft}
+        maxLength={4}
+        onPointerDown={(e) => e.stopPropagation()}
+        onChange={(e) => setDraft(e.target.value)}
+        onBlur={() => {
+          setEditing(false)
+          onCommit(draft.trim())
+        }}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') e.currentTarget.blur()
+          if (e.key === 'Escape') {
+            setDraft(value)
+            setEditing(false)
+          }
+        }}
+      />
+    )
+  }
+
+  return (
+    <button
+      type="button"
+      className="node__label node__label--top node__name"
+      title="Переименовать"
+      onPointerDown={(e) => e.stopPropagation()}
+      onClick={() => {
+        setDraft(value)
+        setEditing(true)
+      }}
+    >
+      {value || placeholder}
+    </button>
   )
 }

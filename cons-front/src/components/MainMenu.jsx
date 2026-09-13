@@ -1,44 +1,47 @@
-// Список лаб — только описания для карточек-кнопок. Сама логика
-// заданий сюда сознательно не входит: лабы пока не реализованы.
-const LABS = [
-  { number: 1, title: 'Базовые логические операции', desc: 'НЕ, И, ИЛИ — фундамент цифровой логики.' },
-  { number: 2, title: 'Комбинационные схемы', desc: 'Шифраторы, дешифраторы, мультиплексоры.' },
-  { number: 3, title: 'Сумматоры', desc: 'Полусумматор и полный сумматор на логических элементах.' },
-  { number: 4, title: 'Триггеры и память', desc: 'RS-, D-триггеры и простейшие запоминающие устройства.' },
-  { number: 5, title: 'Многоуровневые схемы', desc: 'Соединение нескольких узлов в единую систему.' },
-]
+import GateShape from './GateShape'
+import { ELEMENT_TYPES, FULL_PALETTE_IDS } from '../entities/elementTypes'
+import { LABS } from '../entities/labs'
 
-export default function MainMenu({ user, onOpenLab, onOpenFree, onLogout }) {
+// Иконка-превью карточки лабы — значок одного из элементов, изучаемых
+// в этой работе. Чисто декоративно, без встроенной мини-схемы.
+const LAB_ICON = { 1: 'AND', 2: 'XOR', 3: 'OR', 4: 'NAND', 5: 'NOR' }
+
+export default function MainMenu({ onOpenLab, onOpenFree }) {
   return (
     <div className="menu">
       <header className="menu__header">
-        <div>
-          <h1>Лабораторные работы</h1>
-          <p>Интерактивные задания для изучения цифровой логики.</p>
-        </div>
-        <div className="menu__account">
-          <span className="menu__user">{user}</span>
-          <button type="button" className="btn btn--ghost" onClick={onLogout}>
-            Выйти
-          </button>
-        </div>
+        <h1>Лабораторные работы</h1>
+        <p>Интерактивные задания для изучения цифровой логики. Собирайте схемы, проверяйте их работу и закрепляйте знания на практике.</p>
       </header>
 
       <section className="menu__grid">
-        <div className="menu__labs">
-          {LABS.map((lab) => (
-            <button key={lab.number} type="button" className="lab-card" onClick={() => onOpenLab(lab.number)}>
-              <span className="lab-card__badge">Лаб. №{lab.number}</span>
-              <h2>{lab.title}</h2>
-              <p>{lab.desc}</p>
-            </button>
-          ))}
-        </div>
+        {LABS.map((lab) => (
+          <button key={lab.number} type="button" className="lab-card" onClick={() => onOpenLab(lab.number)}>
+            <div className="lab-card__icon">
+              <GateShape type={ELEMENT_TYPES[LAB_ICON[lab.number]]} width={56} height={36} />
+            </div>
+            <span className="lab-card__badge">Лаб. №{lab.number}</span>
+            <h2>{lab.title}</h2>
+            <p>{lab.goal}</p>
+            <div className="lab-card__footer">
+              <span className="lab-card__duration">⏱ {lab.duration}</span>
+              <span className="lab-card__cta">Начать →</span>
+            </div>
+          </button>
+        ))}
 
         <button type="button" className="lab-card lab-card--free" onClick={onOpenFree}>
+          <div className="lab-card__icon lab-card__icon--free">
+            {['NOT', 'AND', 'OR'].map((id) => (
+              <GateShape key={id} type={ELEMENT_TYPES[id]} width={40} height={28} />
+            ))}
+          </div>
           <span className="lab-card__badge lab-card__badge--accent">Свободный режим</span>
           <h2>Своя схема</h2>
-          <p>Полный набор элементов без ограничений и заданий — экспериментируйте свободно.</p>
+          <p>Полный набор из {FULL_PALETTE_IDS.length} элементов без ограничений и заданий — экспериментируйте свободно.</p>
+          <div className="lab-card__footer">
+            <span className="lab-card__cta">Начать →</span>
+          </div>
         </button>
       </section>
     </div>

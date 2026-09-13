@@ -5,6 +5,19 @@ import { evaluateCircuit } from '../entities/circuit'
 let nextId = 1
 const makeId = (prefix) => `${prefix}-${nextId++}`
 
+// Автоподпись для новых входов/выходов: A, B, C… и F, G, H… — так
+// пользователю почти никогда не приходится переименовывать элемент
+// самому, только когда лаба требует конкретное имя (S, P, Q и т.п.).
+function nextLabel(typeId, existingNodes) {
+  const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+  const start = typeId === 'OUTPUT' ? 5 : 0 // выходы начинаются с F
+  const used = new Set(existingNodes.filter((n) => n.typeId === typeId).map((n) => n.label))
+  for (let i = start; i < alphabet.length; i++) {
+    if (!used.has(alphabet[i])) return alphabet[i]
+  }
+  return ''
+}
+
 function statesEqual(a, b) {
   if (a === b) return true
   if (!a || !b) return false
@@ -25,8 +38,16 @@ export function useCircuitState() {
   const addNode = useCallback((typeId, x, y) => {
     const id = makeId(typeId)
     const state = ELEMENT_TYPES[typeId].initialState?.() ?? null
-    setNodes((prev) => [...prev, { id, typeId, x, y, on: false, state }])
+    setNodes((prev) => {
+      const type = ELEMENT_TYPES[typeId]
+      const label = type.kind === 'source' || type.kind === 'sink' ? nextLabel(typeId, prev) : ''
+      return [...prev, { id, typeId, x, y, on: false, state, label }]
+    })
     return id
+  }, [])
+
+  const renameNode = useCallback((id, label) => {
+    setNodes((prev) => prev.map((node) => (node.id === id ? { ...node, label } : node)))
   }, [])
 
   const moveNode = useCallback((id, x, y) => {
@@ -97,6 +118,7 @@ export function useCircuitState() {
     moveNode,
     removeNode,
     toggleInput,
+    renameNode,
     connect,
     removeWire,
     clear,
