@@ -1,5 +1,6 @@
 import GateShape from './GateShape'
 import { ELEMENT_TYPES, FULL_PALETTE_IDS } from '../entities/elementTypes'
+import { getPreviewSize } from '../entities/layout'
 import { LABS } from '../entities/labs'
 
 // Иконка-превью карточки лабы — значок одного из элементов, изучаемых
@@ -18,7 +19,7 @@ export default function MainMenu({ onOpenLab, onOpenFree }) {
         {LABS.map((lab) => (
           <button key={lab.number} type="button" className="lab-card" onClick={() => onOpenLab(lab.number)}>
             <div className="lab-card__icon">
-              <GateShape type={ELEMENT_TYPES[LAB_ICON[lab.number]]} width={56} height={36} />
+              <GateShape type={ELEMENT_TYPES[LAB_ICON[lab.number]]} {...getPreviewSize(ELEMENT_TYPES[LAB_ICON[lab.number]], 52)} />
             </div>
             <span className="lab-card__badge">Лаб. №{lab.number}</span>
             <h2>{lab.title}</h2>
@@ -33,7 +34,7 @@ export default function MainMenu({ onOpenLab, onOpenFree }) {
         <button type="button" className="lab-card lab-card--free" onClick={onOpenFree}>
           <div className="lab-card__icon lab-card__icon--free">
             {['NOT', 'AND', 'OR'].map((id) => (
-              <GateShape key={id} type={ELEMENT_TYPES[id]} width={40} height={28} />
+              <GateShape key={id} type={ELEMENT_TYPES[id]} {...getPreviewSize(ELEMENT_TYPES[id], 40)} />
             ))}
           </div>
           <span className="lab-card__badge lab-card__badge--accent">Свободный режим</span>

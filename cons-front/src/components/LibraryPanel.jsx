@@ -1,4 +1,5 @@
 import { ELEMENT_TYPES, FULL_PALETTE_IDS } from '../entities/elementTypes'
+import { getPreviewSize } from '../entities/layout'
 import ElementGlyph from './ElementGlyph'
 
 // Левая панель — библиотека элементов, из которой их перетаскивают на
@@ -30,7 +31,7 @@ function LibraryItem({ type }) {
   return (
     <div className="library-item" draggable onDragStart={handleDragStart}>
       <div className="library-item__glyph">
-        <ElementGlyph type={type} width={56} height={type.kind === 'memory' ? 36 : 32} on={false} />
+        <ElementGlyph {...getPreviewSize(type, 40)} type={type} on={false} />
       </div>
       <div className="library-item__text">
         <span className="library-item__label">{type.label}</span>

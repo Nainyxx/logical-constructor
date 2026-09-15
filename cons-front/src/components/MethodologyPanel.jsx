@@ -1,5 +1,6 @@
 import GateShape from './GateShape'
 import { ELEMENT_TYPES } from '../entities/elementTypes'
+import { getPreviewSize } from '../entities/layout'
 import { buildTruthTable } from '../entities/truthTable'
 
 // Правая панель — методичка лабораторной работы: цель, краткая теория
@@ -85,7 +86,7 @@ function ReferenceCard({ item }) {
       <div className="ref-card__head">
         {type && (
           <div className="ref-card__glyph">
-            <GateShape type={type} width={56} height={36} />
+            <GateShape type={type} {...getPreviewSize(type, 44)} />
           </div>
         )}
         <div>

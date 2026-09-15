@@ -355,8 +355,8 @@ button {
 
 .library-item__glyph {
   flex: none;
-  width: 60px;
-  height: 36px;
+  min-width: 40px;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -476,8 +476,8 @@ button {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 56px;
-  height: 36px;
+  min-width: 44px;
+  height: 44px;
   background: #fff;
   border: 1px solid var(--panel-border);
   border-radius: 6px;
