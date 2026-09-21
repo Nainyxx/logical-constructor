@@ -1,22 +1,19 @@
 :root {
-  --paper: #ffffff;
-  --grid-line: #e3e8ef;
-  --ink: #1f2430;
-  --muted: #6b7280;
-  --panel-bg: #f7f8fa;
-  --panel-border: #e3e6ea;
-  --node-border: #2b2f3a;
-  --node-bg: #ffffff;
-  --wire-off: #b7bec9;
-  --wire-on: #22c55e;
-  --danger: #ef4444;
-  --accent: #2f6fed;
-  --accent-hover: #255bc7;
-  --accent-soft: rgba(47, 111, 237, 0.1);
+  --ink: #14171f;
+  --muted: #5b6472;
+  --faint: #8a93a3;
+  --line: #d3d9e2;
+  --panel: #f4f6f9;
   --surface: #ffffff;
+  --accent: #1f5fd6;
+  --accent-soft: rgba(31, 95, 214, 0.09);
+  --live: #15a34a;
+  --live-soft: rgba(21, 163, 74, 0.13);
+  --danger: #d92d20;
+  --wire: 1.6px;
 
   color-scheme: light;
-  font: 15px/1.4 system-ui, 'Segoe UI', Roboto, sans-serif;
+  font: 15px/1.45 system-ui, 'Segoe UI', Roboto, 'Noto Sans', sans-serif;
   color: var(--ink);
 }
 
@@ -27,6 +24,7 @@
 body {
   margin: 0;
   overflow: hidden;
+  background: var(--panel);
 }
 
 #root {
@@ -35,6 +33,12 @@ body {
 
 button {
   font: inherit;
+  color: inherit;
+}
+
+.overline {
+  text-decoration: overline;
+  text-decoration-thickness: 1.5px;
 }
 
 /* ---------- кнопки (общие) ---------- */
@@ -44,34 +48,23 @@ button {
   align-items: center;
   justify-content: center;
   gap: 6px;
-  padding: 9px 16px;
+  padding: 8px 14px;
   border-radius: 8px;
   border: 1px solid transparent;
-  font: inherit;
   font-weight: 500;
   font-size: 14px;
   cursor: pointer;
-  transition: background 0.12s, border-color 0.12s, color 0.12s;
   white-space: nowrap;
-}
-
-.btn--primary {
-  background: var(--accent);
-  color: #fff;
-}
-
-.btn--primary:hover {
-  background: var(--accent-hover);
+  transition: background 0.12s, border-color 0.12s, color 0.12s;
 }
 
 .btn--ghost {
-  background: transparent;
-  border-color: var(--panel-border);
-  color: var(--ink);
+  background: var(--surface);
+  border-color: var(--line);
 }
 
 .btn--ghost:hover {
-  border-color: var(--node-border);
+  border-color: var(--ink);
 }
 
 .btn--ghost.is-active {
@@ -85,13 +78,13 @@ button {
 .menu {
   height: 100%;
   overflow-y: auto;
-  padding: 56px 48px;
-  background: var(--panel-bg);
+  padding: 56px 48px 64px;
+  background: var(--panel);
 }
 
 .menu__header {
-  max-width: 1160px;
-  margin: 0 auto 36px;
+  max-width: 1200px;
+  margin: 0 auto 32px;
 }
 
 .menu__header h1 {
@@ -102,17 +95,16 @@ button {
 
 .menu__header p {
   margin: 0;
-  max-width: 620px;
+  max-width: 640px;
   color: var(--muted);
-  font-size: 15px;
-  line-height: 1.5;
+  line-height: 1.55;
 }
 
 .menu__grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 18px;
-  max-width: 1160px;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 20px;
+  max-width: 1200px;
   margin: 0 auto;
 }
 
@@ -121,42 +113,36 @@ button {
   flex-direction: column;
   align-items: flex-start;
   gap: 10px;
-  padding: 22px;
+  padding: 20px;
   background: var(--surface);
-  border: 1px solid var(--panel-border);
+  border: 1px solid var(--line);
   border-radius: 14px;
   text-align: left;
-  font: inherit;
-  color: var(--ink);
   cursor: pointer;
-  transition: border-color 0.12s, box-shadow 0.12s, transform 0.12s;
+  transition: border-color 0.12s, box-shadow 0.12s;
 }
 
 .lab-card:hover {
   border-color: var(--accent);
-  box-shadow: 0 12px 24px -16px rgba(47, 111, 237, 0.45);
-  transform: translateY(-1px);
+  box-shadow: 0 10px 24px -16px rgba(31, 95, 214, 0.5);
 }
 
 .lab-card__icon {
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 18px;
   width: 100%;
-  height: 64px;
+  height: 96px;
   margin-bottom: 4px;
-  background: var(--panel-bg);
+  background: var(--panel);
   border-radius: 10px;
 }
 
-.lab-card__icon--free {
-  gap: 4px;
-}
-
 .lab-card__badge {
-  padding: 2px 9px;
+  padding: 2px 10px;
   border-radius: 999px;
-  background: var(--panel-bg);
+  background: var(--panel);
   color: var(--muted);
   font-size: 12px;
   font-weight: 600;
@@ -169,30 +155,26 @@ button {
 
 .lab-card h2 {
   margin: 0;
-  font-size: 17px;
+  font-size: 18px;
 }
 
 .lab-card p {
   margin: 0;
-  font-size: 13px;
-  line-height: 1.5;
-  color: var(--muted);
   flex: 1;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--muted);
 }
 
 .lab-card__footer {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   width: 100%;
   margin-top: 6px;
   padding-top: 12px;
-  border-top: 1px solid var(--panel-border);
-  font-size: 12.5px;
-}
-
-.lab-card__duration {
-  color: var(--muted);
+  border-top: 1px solid var(--line);
+  font-size: 13px;
 }
 
 .lab-card__cta {
@@ -217,19 +199,14 @@ button {
   display: flex;
   align-items: center;
   gap: 16px;
-  padding: 12px 20px;
+  padding: 10px 20px;
   background: var(--surface);
-  border-bottom: 1px solid var(--panel-border);
+  border-bottom: 1px solid var(--line);
 }
 
 .lab__title {
   margin: 0 auto 0 0;
-  font-size: 16px;
-}
-
-.lab__topbar-actions {
-  display: flex;
-  gap: 8px;
+  font-size: 17px;
 }
 
 .lab__body {
@@ -249,9 +226,10 @@ button {
   flex: none;
   display: flex;
   gap: 4px;
-  padding: 10px 16px 0;
+  padding: 8px 16px 0;
   background: var(--surface);
-  border-bottom: 1px solid var(--panel-border);
+  border-bottom: 1px solid var(--line);
+  overflow-x: auto;
 }
 
 .lab__tabs button {
@@ -261,9 +239,9 @@ button {
   background: transparent;
   color: var(--muted);
   font-weight: 500;
-  font-size: 13.5px;
+  font-size: 14px;
+  white-space: nowrap;
   cursor: pointer;
-  transition: color 0.12s, border-color 0.12s;
 }
 
 .lab__tabs button:hover {
@@ -275,56 +253,38 @@ button {
   border-color: var(--accent);
 }
 
-.app__hint {
-  position: relative;
-  flex: none;
-  margin: 0;
-  padding: 10px 40px 10px 16px;
-  font-size: 13px;
-  color: var(--muted);
-  background: var(--panel-bg);
-  border-bottom: 1px solid var(--panel-border);
-}
-
-.app__hint-close {
-  position: absolute;
-  top: 6px;
-  right: 10px;
-  width: 22px;
-  height: 22px;
-  border: none;
-  background: transparent;
-  color: var(--muted);
-  font-size: 16px;
-  line-height: 1;
-  cursor: pointer;
-  border-radius: 4px;
-}
-
-.app__hint-close:hover {
-  background: var(--panel-border);
-  color: var(--ink);
-}
-
 /* ---------- библиотека элементов (слева) ---------- */
 
 .library {
   flex: none;
-  width: 260px;
+  width: 280px;
   overflow-y: auto;
-  padding: 20px;
-  background: var(--panel-bg);
-  border-right: 1px solid var(--panel-border);
+  padding: 18px 16px;
+  background: var(--panel);
+  border-right: 1px solid var(--line);
 }
 
 .library__header h2 {
-  margin: 0 0 4px;
+  margin: 0 0 2px;
   font-size: 15px;
 }
 
 .library__header p {
-  margin: 0 0 16px;
-  font-size: 12px;
+  margin: 0 0 14px;
+  font-size: 12.5px;
+  color: var(--muted);
+}
+
+.library__group + .library__group {
+  margin-top: 18px;
+}
+
+.library__group-title {
+  margin: 0 0 8px;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
   color: var(--muted);
 }
 
@@ -338,15 +298,15 @@ button {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 9px 10px;
+  padding: 8px 10px;
   border-radius: 10px;
-  background: #fff;
-  border: 1px solid var(--panel-border);
+  background: var(--surface);
+  border: 1px solid var(--line);
   cursor: grab;
 }
 
 .library-item:hover {
-  border-color: var(--node-border);
+  border-color: var(--ink);
 }
 
 .library-item:active {
@@ -355,8 +315,7 @@ button {
 
 .library-item__glyph {
   flex: none;
-  min-width: 40px;
-  height: 40px;
+  width: 96px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -370,13 +329,13 @@ button {
 }
 
 .library-item__label {
-  font-size: 13px;
+  font-size: 13.5px;
   font-weight: 600;
-  color: var(--ink);
+  overflow-wrap: anywhere;
 }
 
 .library-item__desc {
-  font-size: 11px;
+  font-size: 11.5px;
   line-height: 1.3;
   color: var(--muted);
 }
@@ -385,22 +344,22 @@ button {
 
 .methodology {
   flex: none;
-  width: 360px;
+  width: 384px;
   overflow-y: auto;
-  background: #fff;
-  border-left: 1px solid var(--panel-border);
+  background: var(--surface);
+  border-left: 1px solid var(--line);
 }
 
 .methodology__header {
   position: sticky;
   top: 0;
-  z-index: 1;
+  z-index: 2;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 14px 20px;
-  background: #fff;
-  border-bottom: 1px solid var(--panel-border);
+  padding: 12px 20px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
 }
 
 .methodology__header h2 {
@@ -415,40 +374,48 @@ button {
   border-radius: 6px;
   background: transparent;
   color: var(--muted);
-  font-size: 18px;
+  font-size: 20px;
   line-height: 1;
   cursor: pointer;
 }
 
 .methodology__close:hover {
-  background: var(--panel-bg);
+  background: var(--panel);
   color: var(--ink);
 }
 
 .methodology__body {
   display: flex;
   flex-direction: column;
-  gap: 26px;
+  gap: 28px;
   padding: 20px;
-}
-
-.methodology__goal {
-  margin: 0;
-  font-size: 13px;
-  line-height: 1.55;
-  color: var(--muted);
 }
 
 .methodology__section h3 {
   margin: 0 0 10px;
-  font-size: 14px;
+  font-size: 15px;
 }
 
-.methodology__section-hint {
-  margin: 0 0 10px;
+.methodology__section h4 {
+  margin: 16px 0 6px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.methodology__text {
+  margin: 0 0 8px;
+  font-size: 13px;
+  line-height: 1.55;
+  color: #303744;
+}
+
+.methodology__caption {
+  margin: 12px 0 6px;
   font-size: 12px;
   color: var(--muted);
-  line-height: 1.5;
 }
 
 .ref-grid {
@@ -458,86 +425,95 @@ button {
 }
 
 .ref-card {
-  padding: 12px;
-  background: var(--panel-bg);
-  border: 1px solid var(--panel-border);
+  padding: 14px;
+  background: var(--panel);
+  border: 1px solid var(--line);
   border-radius: 10px;
 }
 
-.ref-card__head {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  margin-bottom: 10px;
+.methodology__section .ref-card__title {
+  margin: 0 0 8px;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--ink);
 }
 
 .ref-card__glyph {
-  flex: none;
   display: flex;
   align-items: center;
   justify-content: center;
-  min-width: 44px;
-  height: 44px;
-  background: #fff;
-  border: 1px solid var(--panel-border);
-  border-radius: 6px;
+  margin-bottom: 10px;
+  padding: 10px;
+  overflow-x: auto;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
 }
 
-.ref-card__head h4 {
-  margin: 0 0 2px;
+.ref-card__text {
+  margin: 0 0 8px;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: #303744;
+}
+
+.ref-card__formula {
+  margin: 0 0 8px;
   font-size: 13px;
-}
-
-.ref-card__head p {
-  margin: 0;
-  font-size: 11px;
-  line-height: 1.4;
-  color: var(--muted);
+  font-weight: 600;
 }
 
 .ref-table {
   width: 100%;
+  margin-top: 4px;
   border-collapse: collapse;
-  font-size: 11px;
+  background: var(--surface);
+  font-size: 12px;
 }
 
 .ref-table th,
 .ref-table td {
   padding: 4px 6px;
   text-align: center;
-  border-bottom: 1px solid var(--panel-border);
+  border: 1px solid var(--line);
   font-variant-numeric: tabular-nums;
 }
 
 .ref-table th {
-  color: var(--muted);
+  background: var(--panel);
   font-weight: 600;
 }
 
-.ref-table tr:last-child td {
-  border-bottom: none;
-}
-
 .ref-table td.is-true {
-  color: #178a45;
+  color: #0f7a37;
   font-weight: 700;
-  background: rgba(34, 197, 94, 0.12);
+  background: var(--live-soft);
 }
 
 .formula-box {
-  margin-bottom: 12px;
+  margin-bottom: 4px;
   padding: 10px 14px;
-  background: var(--panel-bg);
-  border: 1px solid var(--panel-border);
+  background: var(--panel);
+  border: 1px solid var(--line);
   border-radius: 8px;
   font-weight: 700;
-  font-size: 14px;
+  font-size: 14.5px;
   text-align: center;
+}
+
+.bullet-list {
+  margin: 0 0 8px;
+  padding-left: 20px;
+  font-size: 13px;
+  line-height: 1.55;
+  color: #303744;
 }
 
 .step-list {
   list-style: none;
-  margin: 0 0 12px;
+  margin: 0;
   padding: 0;
   display: flex;
   flex-direction: column;
@@ -547,14 +523,16 @@ button {
 .step-list li {
   display: flex;
   gap: 10px;
-  font-size: 12px;
+  font-size: 13px;
   line-height: 1.5;
+  color: #303744;
 }
 
 .step-list__num {
   flex: none;
   width: 20px;
   height: 20px;
+  margin-top: 1px;
   border-radius: 50%;
   background: var(--accent);
   color: #fff;
@@ -565,22 +543,6 @@ button {
   justify-content: center;
 }
 
-.methodology__try-btn {
-  width: 100%;
-  padding: 8px;
-  border: 1px solid var(--panel-border);
-  border-radius: 8px;
-  background: #fff;
-  color: var(--accent);
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.methodology__try-btn:hover {
-  border-color: var(--accent);
-}
-
 .task-list {
   display: flex;
   flex-direction: column;
@@ -589,13 +551,13 @@ button {
 
 .task-card {
   border-radius: 10px;
-  border: 1px solid var(--panel-border);
-  background: #fff;
+  border: 1px solid var(--line);
+  background: var(--surface);
   overflow: hidden;
 }
 
 .task-card:hover {
-  border-color: var(--node-border);
+  border-color: var(--ink);
 }
 
 .task-card.is-active {
@@ -618,9 +580,9 @@ button {
   width: 22px;
   height: 22px;
   border-radius: 50%;
-  background: var(--panel-bg);
+  background: var(--panel);
   color: var(--muted);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
   display: flex;
   align-items: center;
@@ -634,29 +596,38 @@ button {
 
 .task-card__formula {
   flex: 1;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
 }
 
 .task-card__chevron {
   color: var(--muted);
-  font-size: 13px;
+  font-size: 14px;
 }
 
-.task-card__points {
+.task-card__body {
+  padding: 0 14px 14px;
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: #303744;
+}
+
+.task-card__body p {
+  margin: 0 0 8px;
+}
+
+.task-card__body ul {
   margin: 0;
-  padding: 0 14px 12px 44px;
+  padding-left: 18px;
   display: flex;
   flex-direction: column;
   gap: 6px;
-  font-size: 11.5px;
-  line-height: 1.5;
-  color: var(--muted);
 }
 
 /* ---------- рабочее поле ---------- */
 
 .workspace-shell {
+  position: relative;
   flex: 1;
   min-height: 0;
   display: flex;
@@ -684,15 +655,69 @@ button {
   transform-origin: 0 0;
 }
 
+/* клетка 12 px (шаг привязки элементов), каждая пятая линия — темнее */
 .workspace__grid {
   position: absolute;
   top: 0;
   left: 0;
-  background-color: var(--paper);
+  background-color: #fff;
   background-image:
-    linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
-    linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
-  background-size: 24px 24px;
+    linear-gradient(to right, #dfe4ec 1px, transparent 1px),
+    linear-gradient(to bottom, #dfe4ec 1px, transparent 1px),
+    linear-gradient(to right, #eff2f7 1px, transparent 1px),
+    linear-gradient(to bottom, #eff2f7 1px, transparent 1px);
+  background-size: 60px 60px, 60px 60px, 12px 12px, 12px 12px;
+}
+
+.workspace__empty {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 24px;
+  text-align: center;
+  pointer-events: none;
+}
+
+.workspace__empty p {
+  max-width: 380px;
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--muted);
+}
+
+.workspace__empty-icon {
+  width: 64px;
+  height: 64px;
+  border: 2px dashed var(--faint);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.85);
+}
+
+.workspace__empty-icon::before {
+  content: '+';
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  font-size: 34px;
+  font-weight: 300;
+  color: var(--faint);
+}
+
+.workspace__help {
+  flex: none;
+  margin: 0;
+  padding: 10px 16px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--muted);
+  background: var(--panel);
+  border-bottom: 1px solid var(--line);
 }
 
 .wires {
@@ -707,31 +732,42 @@ button {
 .wire-hit {
   fill: none;
   stroke: transparent;
-  stroke-width: 18;
+  stroke-width: 14;
   pointer-events: stroke;
   cursor: pointer;
 }
 
 .wire-visible {
   fill: none;
-  stroke: var(--wire-off);
-  stroke-width: 2.5;
+  stroke: var(--ink);
+  stroke-width: var(--wire);
+  stroke-linejoin: round;
   pointer-events: none;
-  transition: stroke 0.1s, stroke-width 0.1s;
 }
 
 .wire-visible.is-live {
-  stroke: var(--wire-on);
+  stroke: var(--live);
+  stroke-width: 2;
 }
 
 .wire--draft {
+  stroke: var(--accent);
   stroke-dasharray: 6 5;
+}
+
+.wire-junction {
+  fill: var(--ink);
+  pointer-events: none;
+}
+
+.wire-junction.is-live {
+  fill: var(--live);
 }
 
 /* при наведении на "hit"-полосу подсвечиваем видимую линию и метку удаления */
 .wire-hit:hover + .wire-visible {
   stroke: var(--danger);
-  stroke-width: 3.5;
+  stroke-width: 3;
 }
 
 .wire-marker {
@@ -746,7 +782,7 @@ button {
 .wire-marker circle {
   fill: #fff;
   stroke: var(--danger);
-  stroke-width: 2;
+  stroke-width: 1.6;
 }
 
 .wire-marker path {
@@ -755,59 +791,141 @@ button {
   stroke-linecap: round;
 }
 
+/* ---------- таблица истинности схемы ---------- */
+
+.ttable {
+  flex: none;
+  max-height: 230px;
+  display: flex;
+  flex-direction: column;
+  padding: 10px 16px 12px;
+  background: var(--surface);
+  border-top: 1px solid var(--line);
+}
+
+.ttable__title {
+  margin: 0 0 8px;
+  font-size: 13px;
+}
+
+.ttable__note {
+  margin: 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.ttable__scroll {
+  min-height: 0;
+  overflow: auto;
+}
+
+.ttable__table {
+  border-collapse: collapse;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+.ttable__table th,
+.ttable__table td {
+  min-width: 44px;
+  padding: 3px 12px;
+  text-align: center;
+  border: 1px solid var(--line);
+}
+
+.ttable__table th {
+  position: sticky;
+  top: 0;
+  background: var(--panel);
+  font-weight: 700;
+}
+
+.ttable__table .is-first-output {
+  border-left: 2px solid var(--ink);
+}
+
+.ttable__table td.is-true {
+  color: #0f7a37;
+  font-weight: 700;
+  background: var(--live-soft);
+}
+
+.ttable__table tr.is-current td {
+  box-shadow: inset 0 -2px 0 var(--accent), inset 0 2px 0 var(--accent);
+  background-color: var(--accent-soft);
+}
+
 /* ---------- нижняя панель инструментов холста ---------- */
 
 .workspace__toolbar {
   flex: none;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 14px;
-  padding: 10px 16px;
+  gap: 8px 10px;
+  padding: 8px 16px;
   background: var(--surface);
-  border-top: 1px solid var(--panel-border);
+  border-top: 1px solid var(--line);
   font-size: 13px;
 }
 
 .workspace__zoom {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 }
 
 .workspace__zoom button {
-  width: 26px;
-  height: 26px;
+  width: 28px;
+  height: 28px;
   border-radius: 6px;
-  border: 1px solid var(--panel-border);
-  background: #fff;
-  color: var(--ink);
-  font-size: 15px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  font-size: 16px;
   line-height: 1;
   cursor: pointer;
 }
 
 .workspace__zoom button:hover {
-  border-color: var(--node-border);
+  border-color: var(--ink);
 }
 
 .workspace__zoom span {
-  min-width: 40px;
+  min-width: 42px;
   text-align: center;
   color: var(--muted);
   font-variant-numeric: tabular-nums;
 }
 
 .workspace__toolbar-btn {
-  padding: 6px 12px;
+  height: 28px;
+  padding: 0 12px;
   border-radius: 6px;
-  border: 1px solid var(--panel-border);
-  background: #fff;
-  color: var(--ink);
+  border: 1px solid var(--line);
+  background: var(--surface);
+  white-space: nowrap;
   cursor: pointer;
 }
 
-.workspace__toolbar-btn:hover {
-  border-color: var(--node-border);
+.workspace__toolbar-btn:hover:not(:disabled) {
+  border-color: var(--ink);
+}
+
+.workspace__toolbar-btn:disabled {
+  color: var(--faint);
+  cursor: default;
+}
+
+.workspace__toolbar-btn.is-active {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.workspace__toolbar-btn--icon {
+  width: 28px;
+  padding: 0;
+  font-weight: 700;
 }
 
 .workspace__status {
@@ -816,17 +934,22 @@ button {
   gap: 6px;
   margin-left: auto;
   color: var(--muted);
+  white-space: nowrap;
 }
 
 .workspace__status-dot {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: var(--wire-off);
+  background: var(--faint);
+}
+
+.workspace__status.is-ready {
+  color: #0f7a37;
 }
 
 .workspace__status.is-ready .workspace__status-dot {
-  background: var(--wire-on);
+  background: var(--live);
 }
 
 /* ---------- узел на поле ---------- */
@@ -842,14 +965,14 @@ button {
 
 .node__remove {
   position: absolute;
-  top: -8px;
-  right: -8px;
+  top: -12px;
+  right: -6px;
   width: 18px;
   height: 18px;
-  line-height: 16px;
+  line-height: 15px;
   padding: 0;
   border-radius: 50%;
-  border: 1px solid var(--panel-border);
+  border: 1px solid var(--line);
   background: #fff;
   color: var(--muted);
   font-size: 13px;
@@ -870,9 +993,9 @@ button {
 /* кликабельная зона порта — заметно больше видимой точки внутри неё */
 .port__hit {
   position: absolute;
-  width: 28px;
-  height: 28px;
-  margin: -14px;
+  width: 24px;
+  height: 24px;
+  margin: -12px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -884,219 +1007,232 @@ button {
 }
 
 .port__dot {
-  width: 12px;
-  height: 12px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
   background: #fff;
-  border: 2px solid var(--wire-off);
+  border: 1.5px solid var(--faint);
   pointer-events: none;
   transition: transform 0.1s, border-color 0.1s;
 }
 
-.port__dot.is-live {
-  border-color: var(--wire-on);
-}
-
-.port__hit:hover .port__dot {
-  transform: scale(1.25);
+.port__dot.is-connected {
   border-color: var(--ink);
 }
 
-/* ---------- тело элемента ---------- */
+.port__dot.is-live {
+  border-color: var(--live);
+  background: var(--live);
+}
+
+.port__hit:hover .port__dot {
+  border-color: var(--accent);
+  transform: scale(1.5);
+}
+
+/* ---------- значки элементов ---------- */
 
 .glyph {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* значок вентиля (GateShape) */
-.gate-shape__lines {
-  stroke: var(--node-border);
-  stroke-width: 2;
-}
-
-.gate-shape__body {
-  fill: #fff;
-  stroke: var(--node-border);
-  stroke-width: 2;
-}
-
-.gate-shape__text {
-  fill: var(--node-border);
-  font-size: 14px;
-  font-weight: 700;
-  text-anchor: middle;
-  dominant-baseline: central;
-}
-
-.gate-shape__bubble {
-  fill: #fff;
-  stroke: var(--node-border);
-  stroke-width: 2;
-}
-
-/* прямоугольник с буквой — для триггера (memory), рисуется по ГОСТ
-   именно так, а не классическим значком */
-.glyph--box {
-  background: #fff;
-  border: 2px solid var(--node-border);
-  border-radius: 3px;
-}
-
-.glyph__symbol {
-  font-size: 16px;
-  font-weight: 700;
-}
-
-/* тумблер входа — фиксированный размер, не зависит от узла, поэтому
-   не растягивается в эллипс; цифра внутри бегунка */
-.switch-track {
-  position: relative;
-  display: block;
-  width: 52px;
-  height: 28px;
-  border-radius: 999px;
-  background: var(--wire-off);
-  transition: background 0.15s;
-}
-
-.switch-track.is-on {
-  background: var(--wire-on);
-}
-
-.switch-knob {
   position: absolute;
-  top: 2px;
-  left: 2px;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--muted);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-  transition: transform 0.15s;
+  inset: 0;
 }
 
-.switch-track.is-on .switch-knob {
-  transform: translateX(24px);
-  color: #178a45;
+.symbol {
+  position: absolute;
+  top: 0;
+  left: 0;
+  overflow: visible;
 }
 
-/* круглый индикатор выхода — правильная окружность с цифрой внутри,
-   вместо растянутого эллипса */
+.preview,
+.ref-card__glyph .symbol,
+.lab-card__icon .symbol {
+  position: relative;
+}
+
+.preview__inner {
+  position: relative;
+  transform-origin: 0 0;
+}
+
+.symbol line,
+.symbol polyline,
+.symbol rect,
+.symbol circle {
+  stroke: var(--ink);
+  stroke-width: var(--wire);
+  stroke-linejoin: miter;
+  fill: none;
+}
+
+.symbol .symbol__body,
+.symbol .symbol__bubble {
+  fill: #fff;
+}
+
+.symbol text {
+  fill: var(--ink);
+  dominant-baseline: central;
+  text-anchor: middle;
+  pointer-events: none;
+}
+
+.symbol__title {
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.symbol__subtitle {
+  font-size: 15px;
+}
+
+.symbol__pin {
+  font-size: 11.5px;
+}
+
+.symbol__name {
+  font-size: 12.5px;
+}
+
+.symbol text.is-overline {
+  text-decoration: overline;
+}
+
+/* вход: тумблер и вывод-провод */
+.lead {
+  position: absolute;
+  top: 24px;
+  height: 0;
+  border-top: var(--wire) solid var(--ink);
+}
+
+.lead--right {
+  left: 70px;
+  right: 0;
+}
+
+.lead--left {
+  left: 0;
+  width: 26px;
+}
+
+.lead.is-on {
+  border-top-color: var(--live);
+}
+
+.switch,
 .indicator {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
+  position: absolute;
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 2px solid var(--node-border);
+  border: var(--wire) solid var(--ink);
   background: #fff;
-  color: var(--muted);
   font-size: 15px;
   font-weight: 700;
-  transition: background 0.15s, border-color 0.15s, box-shadow 0.15s, color 0.15s;
+  font-variant-numeric: tabular-nums;
 }
 
-.indicator.is-on {
-  background: var(--wire-on);
-  border-color: var(--wire-on);
-  color: #fff;
-  box-shadow: 0 0 10px 2px rgba(34, 197, 94, 0.5);
-}
-
-/* подпись элемента: имя входа/выхода сверху (редактируемая), значение
-   вентиля снизу; подписи портов у многовходовых узлов (триггер) */
-.node__label {
-  position: absolute;
-  left: 0;
-  width: 100%;
-  text-align: center;
-  pointer-events: none;
-  user-select: none;
-  white-space: nowrap;
-}
-
-.node__label--top {
-  top: -22px;
-}
-
-.node__label--bottom {
-  bottom: -22px;
-}
-
-.node__name {
-  all: unset;
-  box-sizing: border-box;
-  display: inline-block;
-  pointer-events: auto;
-  cursor: text;
-  padding: 1px 5px;
+.switch {
+  left: 34px;
+  top: 10px;
+  width: 36px;
+  height: 28px;
   border-radius: 4px;
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--ink);
 }
 
-.node__name:hover {
-  background: var(--panel-bg);
+.indicator {
+  left: 26px;
+  top: 8px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+}
+
+.switch.is-on,
+.indicator.is-on {
+  background: var(--live);
+  border-color: var(--live);
+  color: #fff;
+}
+
+/* подпись входа/выхода (A, B, F…) */
+.node__name {
+  position: absolute;
+  top: 12px;
+  height: 24px;
+  padding: 0 3px;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 24px;
+  white-space: nowrap;
+  cursor: text;
+}
+
+button.node__name:hover {
+  background: var(--accent-soft);
+}
+
+.node__name--left {
+  left: 0;
+  width: 32px;
+  text-align: right;
+}
+
+.node__name--right {
+  left: 62px;
+  min-width: 34px;
+  text-align: left;
 }
 
 .node__name-input {
-  all: unset;
-  box-sizing: border-box;
-  pointer-events: auto;
-  width: 34px;
-  text-align: center;
-  padding: 1px 3px;
+  width: 48px;
   border: 1px solid var(--accent);
-  border-radius: 4px;
   background: #fff;
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--ink);
-}
-
-.node__value {
-  display: inline-block;
-  min-width: 16px;
-  padding: 1px 5px;
-  border-radius: 3px;
-  border: 1px solid var(--panel-border);
-  background: #fff;
-  font-size: 11px;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-  color: var(--muted);
-}
-
-.node__value.is-on {
-  color: #178a45;
-  border-color: var(--wire-on);
-}
-
-.node__port-label {
-  position: absolute;
-  font-size: 9px;
+  font: inherit;
+  font-size: 15px;
   font-weight: 600;
-  color: var(--muted);
-  pointer-events: none;
-  user-select: none;
-  white-space: nowrap;
+  outline: none;
 }
 
-.node__port-label--in {
-  transform: translate(6px, -50%);
+.node__name-input.node__name--left {
+  left: -14px;
+  text-align: right;
 }
 
-.node__port-label--out {
-  transform: translate(calc(-100% - 6px), -50%);
+/* ---------- адаптивность ---------- */
+
+@media (max-width: 1400px) {
+  .library {
+    width: 216px;
+    padding: 14px 12px;
+  }
+
+  .library-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+
+  .library-item__glyph {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .methodology {
+    width: 344px;
+  }
+}
+
+@media (max-width: 900px) {
+  .menu {
+    padding: 32px 20px;
+  }
+
+  .methodology {
+    width: 300px;
+  }
 }

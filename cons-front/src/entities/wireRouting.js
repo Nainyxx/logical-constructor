@@ -1,38 +1,79 @@
 // Провод по ГОСТ — ломаная линия строго из горизонтальных и вертикальных
 // отрезков (без плавных поворотов), выходящая из выхода вправо и
 // входящая во вход слева — как на схемах в методичках.
+//
+// Все провода одного выхода делают первый поворот в одном и том же
+// месте (trunk правее выхода): получается общая вертикальная «шина», а
+// в точке ветвления рисуется точка-узел (см. WireLayer), как в методичках.
+// Чтобы шины разных выходов не сливались в одну линию, WireLayer разводит
+// их по «полосам» (assignTrunks): каждая шина сдвигается на LANE вправо,
+// пока не перестанет накладываться на уже проложенную.
 
-const MIN_STUB = 24 // минимальная длина горизонтального отрезка у самого порта
-const DETOUR_GAP = 28 // на сколько провод уходит за пределы обеих точек в обходном маршруте
+export const TRUNK = 24 // на сколько правее выхода проходит общая вертикаль ветвления
+const LANE = 8 // шаг между соседними шинами
+const MIN_RUN = 12 // минимальный горизонтальный отрезок перед входом
+const DETOUR_GAP = 36 // на сколько ниже нижнего порта идёт обходной провод
 
 /**
  * Ломаная между выходом (from) и входом (to) в виде списка вершин.
- * Если вход находится правее выхода — обычный Z-образный маршрут в два
- * излома. Если вход находится левее или совсем рядом по X — обходной
- * маршрут: короткий отрезок от каждого порта наружу, затем провод
- * уходит за нижнюю точку и заходит во вход с его стороны (как реальный
- * провод, который нельзя провести сквозь корпус элемента).
+ * Если вход правее шины — обычный маршрут в два излома. Если вход левее
+ * или вплотную к выходу — обходной: провод уходит вниз под оба элемента
+ * и заходит во вход слева (как реальный провод, который нельзя провести
+ * сквозь корпус элемента).
  */
-export function routePoints(from, to) {
-  if (from.y === to.y) return [from, to]
+export function routePoints(from, to, trunk = TRUNK) {
+  if (from.y === to.y && to.x > from.x) return [from, to]
 
-  const dx = to.x - from.x
-  if (dx >= MIN_STUB * 2) {
-    const midX = from.x + dx / 2
-    return [from, { x: midX, y: from.y }, { x: midX, y: to.y }, to]
+  const trunkX = from.x + trunk
+  if (to.x - trunkX >= MIN_RUN) {
+    return [from, { x: trunkX, y: from.y }, { x: trunkX, y: to.y }, to]
   }
 
-  const exitX = from.x + MIN_STUB
-  const enterX = to.x - MIN_STUB
+  const enterX = to.x - TRUNK
   const detourY = Math.max(from.y, to.y) + DETOUR_GAP
   return [
     from,
-    { x: exitX, y: from.y },
-    { x: exitX, y: detourY },
+    { x: trunkX, y: from.y },
+    { x: trunkX, y: detourY },
     { x: enterX, y: detourY },
     { x: enterX, y: to.y },
     to,
   ]
+}
+
+/**
+ * Раздаёт шинам выходов смещения так, чтобы вертикальные участки разных
+ * сигналов не ложились друг на друга.
+ * @param {Array<{ key: string, from: {x, y}, ys: number[], xs: number[] }>} groups по одной записи
+ *   на выход: from — точка выхода, xs/ys — координаты всех входов, куда идут его провода
+ * @returns {Map<string, number>} key -> смещение шины от выхода
+ */
+export function assignTrunks(groups) {
+  const placed = []
+  const result = new Map()
+  const ordered = [...groups].sort((a, b) => a.from.x - b.from.x || a.from.y - b.from.y)
+
+  for (const group of ordered) {
+    // Шина не должна уходить дальше, чем позволяет ближайший вход справа.
+    let cap = Infinity
+    for (const x of group.xs) {
+      const dx = x - group.from.x
+      if (dx >= MIN_RUN * 2) cap = Math.min(cap, dx - MIN_RUN)
+    }
+    const base = Math.min(TRUNK, cap)
+    const top = Math.min(group.from.y, ...group.ys) - 4
+    const bottom = Math.max(group.from.y, ...group.ys) + 4
+    let offset = base
+    while (
+      offset + LANE <= cap &&
+      placed.some((p) => p.x === group.from.x + offset && p.top <= bottom && top <= p.bottom)
+    ) {
+      offset += LANE
+    }
+    placed.push({ x: group.from.x + offset, top, bottom })
+    result.set(group.key, offset)
+  }
+  return result
 }
 
 export function pointsToPath(points) {

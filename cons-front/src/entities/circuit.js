@@ -62,16 +62,25 @@ function runPass(nodes, wires, seed, nextStates) {
     if (!node) return { outputs: [], display: false }
     const type = ELEMENT_TYPES[node.typeId]
 
+    // Триггер (memory) отдаёт наружу то, что записано в нём сейчас, а не
+    // то, что он запишет по текущему такту. Иначе в регистре сдвига новое
+    // значение первого триггера «проскакивало» бы через все остальные в
+    // одном и том же такте, а не смещалось на один разряд. Новое
+    // состояние вычисляется отдельно и попадёт в узел уже на следующем
+    // шаге (см. nextStates). Заодно это разрывает обратную связь триггера
+    // на самого себя (T-триггер).
+    if (type.kind === 'memory') {
+      const published = type.peek(node.state)
+      values.set(nodeId, { outputs: published, display: published[0] })
+      runEvaluate(type, node, readInputs(node, type, wires, resolve), nextStates)
+      return values.get(nodeId)
+    }
+
     // Защита от зацикленных схем: вход, ссылающийся сам на себя через
-    // кольцо, берём из состояния "как было" — у элементов с памятью это
-    // их сохранённое состояние (peek), у обычных вентилей — результат
-    // предыдущего прохода/вызова (seed). Ничего из этого нет только на
-    // самом первом вызове схемы — тогда падаем в false, как и раньше.
+    // кольцо вентилей, берём из результата предыдущего прохода/вызова
+    // (seed). Его нет только на самом первом вызове схемы — тогда
+    // падаем в false.
     if (inProgress.has(nodeId)) {
-      if (type.peek) {
-        const outputs = type.peek(node.state)
-        return { outputs, display: outputs[0] }
-      }
       const seeded = seed.get(nodeId)
       if (seeded) return seeded
       return { outputs: [], display: false }

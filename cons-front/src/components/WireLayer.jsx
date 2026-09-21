@@ -1,5 +1,5 @@
 import { WORLD_SIZE, getInputPortPosition, getOutputPortPosition } from '../entities/layout'
-import { pathMidpoint, pointsToPath, routePoints } from '../entities/wireRouting'
+import { assignTrunks, pathMidpoint, pointsToPath, routePoints } from '../entities/wireRouting'
 
 // SVG-слой поверх всех узлов, рисующий провода между портами и
 // "черновой" провод во время перетаскивания нового соединения.
@@ -7,6 +7,9 @@ import { pathMidpoint, pointsToPath, routePoints } from '../entities/wireRouting
 // У каждого провода два наложенных path: тонкий видимый и толстый
 // прозрачный "hit" поверх него — так провод легко подцепить курсором,
 // не попадая точно в линию толщиной в пару пикселей.
+//
+// Если от одного выхода отходит больше одного провода, в точке общего
+// ветвления рисуется точка-узел — как на схемах в методичках.
 export default function WireLayer({ nodes, wires, values, draftWire, onDeleteWire }) {
   const nodeById = new Map(nodes.map((node) => [node.id, node]))
 
@@ -24,14 +27,35 @@ export default function WireLayer({ nodes, wires, values, draftWire, onDeleteWir
     return { x: node.x + pos.x, y: node.y + pos.y }
   }
 
+  // Сначала собираем провода по выходам, затем раздаём выходам шины (см. assignTrunks).
+  const outputs = new Map() // "узел:порт" -> { key, from, ys, live }
+  const resolved = wires
+    .map((wire) => {
+      const from = outputPoint(wire.fromNodeId, wire.fromPort ?? 0)
+      const to = inputPoint(wire.toNodeId, wire.toPort)
+      if (!from || !to) return null
+      const key = `${wire.fromNodeId}:${wire.fromPort ?? 0}`
+      const live = !!values.get(wire.fromNodeId)?.outputs?.[wire.fromPort ?? 0]
+      const group = outputs.get(key) ?? { key, from, xs: [], ys: [], count: 0, live }
+      group.xs.push(to.x)
+      group.ys.push(to.y)
+      group.count += 1
+      outputs.set(key, group)
+      return { wire, from, to, key, live }
+    })
+    .filter(Boolean)
+
+  const trunks = assignTrunks([...outputs.values()])
+  const drawn = resolved.map(({ wire, from, to, key, live }) => ({
+    wire,
+    live,
+    points: routePoints(from, to, trunks.get(key)),
+  }))
+  const branches = [...outputs.values()].filter((group) => group.count > 1)
+
   return (
     <svg className="wires" width={WORLD_SIZE} height={WORLD_SIZE}>
-      {wires.map((wire) => {
-        const from = outputPoint(wire.fromNodeId, wire.fromPort ?? 0)
-        const to = inputPoint(wire.toNodeId, wire.toPort)
-        if (!from || !to) return null
-        const live = values.get(wire.fromNodeId)?.outputs?.[wire.fromPort ?? 0]
-        const points = routePoints(from, to)
+      {drawn.map(({ wire, live, points }) => {
         const d = pointsToPath(points)
         const mid = pathMidpoint(points)
 
@@ -53,6 +77,16 @@ export default function WireLayer({ nodes, wires, values, draftWire, onDeleteWir
           </g>
         )
       })}
+
+      {branches.map((group) => (
+        <circle
+          key={group.key}
+          className={`wire-junction ${group.live ? 'is-live' : ''}`}
+          cx={group.from.x + trunks.get(group.key)}
+          cy={group.from.y}
+          r="3.5"
+        />
+      ))}
 
       {draftWire &&
         (() => {

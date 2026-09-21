@@ -1,14 +1,16 @@
-import GateShape from './GateShape'
+import Name from './Name'
+import ReferenceGlyph from './ReferenceGlyph'
 import { ELEMENT_TYPES } from '../entities/elementTypes'
-import { getPreviewSize } from '../entities/layout'
 import { buildTruthTable } from '../entities/truthTable'
 
 // Правая панель — методичка лабораторной работы: цель, краткая теория
-// по нужным для неё элементам (значок + таблица истинности строятся
-// автоматически по самому элементу — методичка не может разойтись с
-// тем, что реально считает схема), тренировочный пример и список
-// заданий. Клик по заданию переключает вкладку холста на него.
+// по нужным для неё элементам (значок и таблица истинности вентилей
+// строятся автоматически по самому элементу — методичка не может
+// разойтись с тем, что реально считает схема), тренировочный пример и
+// список заданий. Клик по заданию переключает вкладку холста на него.
 export default function MethodologyPanel({ lab, activeTab, onSelectTab, onClose }) {
+  const { example } = lab
+
   return (
     <aside className="methodology">
       <div className="methodology__header">
@@ -19,7 +21,10 @@ export default function MethodologyPanel({ lab, activeTab, onSelectTab, onClose 
       </div>
 
       <div className="methodology__body">
-        <p className="methodology__goal">{lab.goal}</p>
+        <section className="methodology__section">
+          <h3>Цель работы</h3>
+          <p className="methodology__text">{lab.goal}</p>
+        </section>
 
         <section className="methodology__section">
           <h3>Теория</h3>
@@ -31,25 +36,35 @@ export default function MethodologyPanel({ lab, activeTab, onSelectTab, onClose 
         </section>
 
         <section className="methodology__section">
-          <h3>Тренировочный пример</h3>
-          <p className="methodology__section-hint">Построим схему:</p>
-          <div className="formula-box">{lab.example.formula}</div>
+          <h3>Пример работы в тренажёре</h3>
+          <div className="formula-box">{example.formula}</div>
+          <h4>Анализ схемы</h4>
+          <p className="methodology__text">{example.analysis}</p>
+          <h4>Перетащите на рабочее поле</h4>
+          <ul className="bullet-list">
+            {example.place.map((line) => (
+              <li key={line}>{line}</li>
+            ))}
+          </ul>
+          <p className="methodology__text">{example.label}</p>
+          <h4>Соедините проводники</h4>
           <ol className="step-list">
-            {lab.example.steps.map((step, i) => (
+            {example.connect.map((step, i) => (
               <li key={i}>
                 <span className="step-list__num">{i + 1}</span>
                 <span>{step}</span>
               </li>
             ))}
           </ol>
-          <button type="button" className="methodology__try-btn" onClick={() => onSelectTab('training')}>
-            Открыть вкладку «Тренировка» →
-          </button>
+          <h4>Тестирование</h4>
+          <p className="methodology__text">{example.test}</p>
+          <p className="methodology__caption">Ожидаемые показания:</p>
+          <RefTable table={example.check} />
         </section>
 
         <section className="methodology__section">
           <h3>Задания</h3>
-          <p className="methodology__section-hint">{lab.deliverable}</p>
+          <p className="methodology__text">{lab.deliverable}</p>
           <div className="task-list">
             {lab.tasks.map((task, i) => {
               const isActive = activeTab === i
@@ -57,15 +72,20 @@ export default function MethodologyPanel({ lab, activeTab, onSelectTab, onClose 
                 <div key={task.title} className={`task-card ${isActive ? 'is-active' : ''}`}>
                   <button type="button" className="task-card__head" onClick={() => onSelectTab(i)}>
                     <span className="task-card__num">{i + 1}</span>
-                    <span className="task-card__formula">{task.formula}</span>
+                    <span className="task-card__formula">{task.heading}</span>
                     <span className="task-card__chevron">{isActive ? '⌄' : '›'}</span>
                   </button>
                   {isActive && (
-                    <ul className="task-card__points">
-                      {task.points.map((point, j) => (
-                        <li key={j}>{point}</li>
-                      ))}
-                    </ul>
+                    <div className="task-card__body">
+                      <p>{task.statement}</p>
+                      {task.points.length > 0 && (
+                        <ul>
+                          {task.points.map((point, j) => (
+                            <li key={j}>{point}</li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
                   )}
                 </div>
               )
@@ -78,29 +98,26 @@ export default function MethodologyPanel({ lab, activeTab, onSelectTab, onClose 
 }
 
 function ReferenceCard({ item }) {
-  const type = item.gateId ? ELEMENT_TYPES[item.gateId] : null
-  const table = type ? gateTruthTable(type) : item.table
+  const gate = item.gateId ? ELEMENT_TYPES[item.gateId] : null
+  const table = gate ? gateTruthTable(gate) : item.table
 
   return (
     <div className="ref-card">
-      <div className="ref-card__head">
-        {type && (
-          <div className="ref-card__glyph">
-            <GateShape type={type} {...getPreviewSize(type, 44)} />
-          </div>
-        )}
-        <div>
-          <h4>{item.term}</h4>
-          <p>{item.formula ?? type?.description}</p>
+      <h4 className="ref-card__title">{item.term}</h4>
+      {(gate || item.box) && (
+        <div className="ref-card__glyph">
+          <ReferenceGlyph item={item} />
         </div>
-      </div>
-      <TruthTable table={table} />
+      )}
+      <p className="ref-card__text">{item.text}</p>
+      {gate && <p className="ref-card__formula">{gate.formula}</p>}
+      {table && <RefTable table={table} />}
     </div>
   )
 }
 
 function gateTruthTable(type) {
-  const headers = (type.inputCount === 1 ? ['A'] : ['A', 'B']).concat(type.outputLabels ?? ['Y'])
+  const headers = (type.inputCount === 1 ? ['A'] : ['A', 'B']).concat('Y')
   const rows = buildTruthTable(type).map((row) => [
     ...row.inputs.map((b) => (b ? 1 : 0)),
     ...row.outputs.map((b) => (b ? 1 : 0)),
@@ -111,14 +128,16 @@ function gateTruthTable(type) {
 // Подсвечиваем зелёным только значения 1 в столбцах ВЫХОДОВ — иначе
 // единицы во входных столбцах (которые просто перечисляют все наборы
 // сигналов) выглядели бы как «интересный», особенный результат.
-function TruthTable({ table }) {
+function RefTable({ table }) {
   const inputCols = table.inputCols ?? 0
   return (
     <table className="ref-table">
       <thead>
         <tr>
           {table.headers.map((h) => (
-            <th key={h}>{h}</th>
+            <th key={h}>
+              <Name>{h}</Name>
+            </th>
           ))}
         </tr>
       </thead>

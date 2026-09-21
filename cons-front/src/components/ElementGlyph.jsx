@@ -1,43 +1,29 @@
-import GateShape from './GateShape'
+import BoxSymbol from './BoxSymbol'
+import { boxOfType } from '../entities/symbols'
 
-// Визуальное "тело" элемента: классический значок вентиля для gate,
-// прямоугольник с буквой для memory (триггер — так их и рисуют по ГОСТ),
-// тумблер для входа, круглый индикатор с цифрой для выхода.
+// Визуальное "тело" элемента: УГО по ГОСТ для вентилей и триггеров
+// (BoxSymbol), тумблер для входа и круглый индикатор для выхода.
 //
-// У тумблера и индикатора фиксированный внутренний размер (не зависит
-// от width/height контейнера) — контейнер лишь центрирует их и задаёт
-// кликабельную область узла, поэтому форма никогда не искажается в
-// эллипс при нестандартных пропорциях узла.
-export default function ElementGlyph({ type, width, height, on }) {
+// У тумблера и индикатора фиксированный размер, а узел лишь позиционирует
+// их: вывод-провод слева/справа от них заканчивается ровно на порте узла.
+export default function ElementGlyph({ type, on, scale = 1 }) {
   if (type.kind === 'source') {
     return (
-      <div className="glyph" style={{ width, height }}>
-        <span className={`switch-track ${on ? 'is-on' : ''}`}>
-          <span className="switch-knob">{on ? 1 : 0}</span>
-        </span>
+      <div className="glyph glyph--source">
+        <span className={`switch ${on ? 'is-on' : ''}`}>{on ? 1 : 0}</span>
+        <span className={`lead lead--right ${on ? 'is-on' : ''}`} />
       </div>
     )
   }
 
   if (type.kind === 'sink') {
     return (
-      <div className="glyph" style={{ width, height }}>
+      <div className="glyph glyph--sink">
+        <span className={`lead lead--left ${on ? 'is-on' : ''}`} />
         <span className={`indicator ${on ? 'is-on' : ''}`}>{on ? 1 : 0}</span>
       </div>
     )
   }
 
-  if (type.kind === 'memory') {
-    return (
-      <div className="glyph glyph--box" style={{ width, height }}>
-        <span className="glyph__symbol">{type.boxLabel}</span>
-      </div>
-    )
-  }
-
-  return (
-    <div className="glyph" style={{ width, height }}>
-      <GateShape type={type} width={width} height={height} />
-    </div>
-  )
+  return <BoxSymbol box={boxOfType(type)} scale={scale} />
 }
