@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { ELEMENT_TYPES } from '../entities/elementTypes'
 import { evaluateCircuit } from '../entities/circuit'
 
@@ -64,9 +64,11 @@ export function useCircuitState() {
   }, [])
 
   // Один вход может принять только один провод — новое соединение
-  // вытесняет старое, если оно было в этот же порт.
+  // вытесняет старое, если оно было в этот же порт. Узел на самого себя
+  // заводить можно и нужно (обратная связь триггера, T-триггер из
+  // D-триггера с Q' на D) — цикл в схеме безопасно обрабатывает сам
+  // evaluateCircuit (см. inProgress в entities/circuit.js).
   const connect = useCallback((fromNodeId, fromPort, toNodeId, toPort) => {
-    if (fromNodeId === toNodeId) return
     setWires((prev) => [
       ...prev.filter((wire) => !(wire.toNodeId === toNodeId && wire.toPort === toPort)),
       { id: makeId('wire'), fromNodeId, fromPort, toNodeId, toPort },
@@ -82,7 +84,18 @@ export function useCircuitState() {
     setWires([])
   }, [])
 
-  const { values, nextStates } = useMemo(() => evaluateCircuit(nodes, wires), [nodes, wires])
+  // Комбинационная обратная связь (RS-триггер на двух «ИЛИ-НЕ», без
+  // отдельного элемента памяти) держит значение между пересчётами схемы
+  // не сама по себе — её "прошлое" нужно передавать явно. Этот ref несёт
+  // результат предыдущего вызова в evaluateCircuit как отправную точку
+  // для узлов внутри цикла (см. entities/circuit.js).
+  const previousValuesRef = useRef(new Map())
+
+  const { values, nextStates } = useMemo(() => {
+    const result = evaluateCircuit(nodes, wires, previousValuesRef.current)
+    previousValuesRef.current = result.values
+    return result
+  }, [nodes, wires])
 
   // Триггеры и ячейки памяти хранят своё состояние в самом узле, а не
   // выводят его заново из текущих входов. Как только вычисленное

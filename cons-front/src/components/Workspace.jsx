@@ -1,11 +1,14 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import ElementNode from './ElementNode'
+import TruthTablePanel from './TruthTablePanel'
 import WireLayer from './WireLayer'
 import { ELEMENT_TYPES } from '../entities/elementTypes'
-import { WORLD_SIZE, getNodeSize } from '../entities/layout'
+import { WORLD_SIZE, getNodeSize, snap } from '../entities/layout'
+import { buildCircuitTable } from '../entities/truthTable'
 
 const MIN_SCALE = 0.4
 const MAX_SCALE = 2.5
+const FIT_MAX_SCALE = 1.25 // «Вся схема» не должна раздувать маленькую схему на весь экран
 const CLICK_THRESHOLD = 4 // px — меньше — считаем это кликом, а не перетаскиванием
 
 /**
@@ -30,11 +33,15 @@ export default function Workspace({
   connect,
   removeWire,
   clear,
+  emptyHint = 'Перетащите элементы из библиотеки на поле и соедините их проводниками',
+  tableOpenByDefault = false,
 }) {
   const containerRef = useRef(null)
   const interactionRef = useRef(null)
   const [view, setView] = useState({ x: 0, y: 0, scale: 1 })
   const [draftWire, setDraftWire] = useState(null)
+  const [showTable, setShowTable] = useState(tableOpenByDefault)
+  const [showHelp, setShowHelp] = useState(false)
 
   // Слушатели на window вешаются один раз (см. эффект ниже) и не должны
   // пересоздаваться при каждом кадре перетаскивания — поэтому читают
@@ -43,9 +50,11 @@ export default function Workspace({
   latestRef.current = { view, nodes, moveNode, toggleInput, connect }
 
   // Центрируем видимую область поля при первом рендере.
+  // Если на этой вкладке уже что-то собрано (переключились с другой
+  // вкладки) — сразу вписываем схему в экран, а не показываем пустой центр.
   useLayoutEffect(() => {
-    const rect = containerRef.current.getBoundingClientRect()
-    setView({ x: rect.width / 2 - WORLD_SIZE / 2, y: rect.height / 2 - WORLD_SIZE / 2, scale: 1 })
+    fitToView()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   // Читает view из latestRef, а не из замыкания рендера — эту функцию
@@ -137,7 +146,7 @@ export default function Workspace({
         const dx = (e.clientX - interaction.startClientX) / view.scale
         const dy = (e.clientY - interaction.startClientY) / view.scale
         if (Math.abs(dx) > CLICK_THRESHOLD || Math.abs(dy) > CLICK_THRESHOLD) interaction.moved = true
-        moveNode(interaction.nodeId, interaction.startNodeX + dx, interaction.startNodeY + dy)
+        moveNode(interaction.nodeId, snap(interaction.startNodeX + dx), snap(interaction.startNodeY + dy))
       } else if (interaction.type === 'wire') {
         const world = screenToWorld(e.clientX, e.clientY)
         setDraftWire((d) => d && { ...d, x: world.x, y: world.y })
@@ -226,7 +235,7 @@ export default function Workspace({
     })
     const spanX = maxX - minX + PADDING * 2
     const spanY = maxY - minY + PADDING * 2
-    const scale = Math.min(MAX_SCALE, Math.max(MIN_SCALE, Math.min(rect.width / spanX, rect.height / spanY)))
+    const scale = Math.min(FIT_MAX_SCALE, Math.max(MIN_SCALE, Math.min(rect.width / spanX, rect.height / spanY)))
     const midX = (minX + maxX) / 2
     const midY = (minY + maxY) / 2
     setView({ x: rect.width / 2 - midX * scale, y: rect.height / 2 - midY * scale, scale })
@@ -240,14 +249,38 @@ export default function Workspace({
     if (!typeId) return
     const world = screenToWorld(e.clientX, e.clientY)
     const size = getNodeSize(ELEMENT_TYPES[typeId])
-    addNode(typeId, world.x - size.width / 2, world.y - size.height / 2)
+    addNode(typeId, snap(world.x - size.width / 2), snap(world.y - size.height / 2))
   }
 
+  // Подключённость портов: для статуса внизу и для подсветки самих портов.
+  const { connections, freeInputs } = useMemo(() => {
+    const map = new Map(nodes.map((n) => [n.id, { inputs: new Set(), outputs: new Set() }]))
+    wires.forEach((w) => {
+      map.get(w.fromNodeId)?.outputs.add(w.fromPort ?? 0)
+      map.get(w.toNodeId)?.inputs.add(w.toPort)
+    })
+    const free = nodes.reduce((sum, n) => sum + n.type.inputCount - (map.get(n.id)?.inputs.size ?? 0), 0)
+    return { connections: map, freeInputs: free }
+  }, [nodes, wires])
+
+  const table = useMemo(() => (showTable ? buildCircuitTable(nodes, wires) : null), [showTable, nodes, wires])
+
   const status =
-    nodes.length === 0 ? 'Разместите элементы' : wires.length === 0 ? 'Соедините элементы' : 'Схема собрана'
+    nodes.length === 0
+      ? { text: 'Разместите элементы', ready: false }
+      : freeInputs > 0
+        ? { text: `Не подключено входов: ${freeInputs}`, ready: false }
+        : { text: 'Все соединения корректны', ready: true }
 
   return (
     <div className="workspace-shell">
+      {showHelp && (
+        <p className="workspace__help">
+          Перетащите элемент из библиотеки на поле. Тяните от точки справа (выход) к точке слева (вход) — так
+          соединяются провода. Клик по проводу удаляет его, клик по тумблеру «Входа» переключает 0/1, клик по подписи
+          A/F переименовывает элемент (имя «!Q» рисуется с чертой). Колесо мыши — масштаб, перетаскивание фона — сдвиг.
+        </p>
+      )}
       <div
         ref={containerRef}
         className="workspace"
@@ -268,6 +301,8 @@ export default function Workspace({
               key={node.id}
               node={node}
               value={values.get(node.id)}
+              connectedInputs={connections.get(node.id).inputs}
+              connectedOutputs={connections.get(node.id).outputs}
               onStartMove={handleNodePointerDown}
               onStartWire={handleWireStart}
               onRemove={removeNode}
@@ -275,7 +310,16 @@ export default function Workspace({
             />
           ))}
         </div>
+
+        {nodes.length === 0 && (
+          <div className="workspace__empty">
+            <span className="workspace__empty-icon" aria-hidden="true" />
+            <p>{emptyHint}</p>
+          </div>
+        )}
       </div>
+
+      {showTable && <TruthTablePanel table={table} />}
 
       <div className="workspace__toolbar">
         <div className="workspace__zoom">
@@ -287,15 +331,30 @@ export default function Workspace({
             +
           </button>
         </div>
-        <button type="button" className="workspace__toolbar-btn" onClick={fitToView}>
-          Показать всю схему
+        <button type="button" className="workspace__toolbar-btn" disabled={nodes.length === 0} onClick={fitToView}>
+          Вся схема
         </button>
-        <button type="button" className="workspace__toolbar-btn" onClick={clear}>
-          Очистить поле
+        <button type="button" className="workspace__toolbar-btn" disabled={nodes.length === 0} onClick={clear}>
+          Очистить
         </button>
-        <span className={`workspace__status ${wires.length > 0 ? 'is-ready' : ''}`}>
+        <button
+          type="button"
+          className={`workspace__toolbar-btn ${showTable ? 'is-active' : ''}`}
+          onClick={() => setShowTable((v) => !v)}
+        >
+          Таблица истинности
+        </button>
+        <button
+          type="button"
+          className={`workspace__toolbar-btn workspace__toolbar-btn--icon ${showHelp ? 'is-active' : ''}`}
+          title="Как пользоваться"
+          onClick={() => setShowHelp((v) => !v)}
+        >
+          ?
+        </button>
+        <span className={`workspace__status ${status.ready ? 'is-ready' : ''}`}>
           <span className="workspace__status-dot" />
-          {status}
+          {status.text}
         </span>
       </div>
     </div>

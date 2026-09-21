@@ -1,16 +1,27 @@
-# React + Vite
+# Конструктор логических схем
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Тренажёр для лабораторных работ по цифровой логике: пять работ по методичкам
+(базовые элементы, сумматоры и компараторы, дешифраторы и мультиплексоры,
+триггеры, регистры) и свободный режим с полным набором элементов.
 
-Currently, two official plugins are available:
+Условные обозначения — по ГОСТ 2.743-91, как в методичках: прямоугольные
+корпуса с «&», «≥1», «=1», «1», кружок инверсии, треугольник динамического
+входа, ортогональные провода с точками в местах ветвления.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Запуск
 
-## React Compiler
+```
+npm install
+npm run dev     # разработка
+npm run build   # сборка в dist/
+npm run lint
+```
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Устройство
 
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+- `src/entities/labs.js` — содержание работ (цель, теория, пример, задания) по методичкам;
+- `src/entities/elementTypes.js` — описание элементов и их логики;
+- `src/entities/circuit.js` — вычисление схемы, в том числе триггеров и обратных связей;
+- `src/entities/symbols.js`, `components/BoxSymbol.jsx` — ГОСТ-значки;
+- `src/entities/wireRouting.js` — прокладка проводов;
+- `src/entities/truthTable.js` — таблица истинности элемента и всей схемы.

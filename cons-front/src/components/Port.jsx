@@ -4,7 +4,7 @@
 //
 // Кликабельная зона (.port__hit) заметно больше видимой точки
 // (.port__dot) — иначе в кружок пришлось бы попадать пиксель в пиксель.
-export default function Port({ nodeId, index, direction, x, y, live, onStartWire }) {
+export default function Port({ nodeId, index, direction, x, y, live, connected, onStartWire }) {
   return (
     <div
       className={`port__hit port__hit--${direction}`}
@@ -14,7 +14,7 @@ export default function Port({ nodeId, index, direction, x, y, live, onStartWire
       data-port-dir={direction}
       onPointerDown={direction === 'out' ? (e) => onStartWire(e, nodeId, index) : undefined}
     >
-      <span className={`port__dot ${live ? 'is-live' : ''}`} />
+      <span className={`port__dot ${live ? 'is-live' : ''} ${connected ? 'is-connected' : ''}`} />
     </div>
   )
 }
