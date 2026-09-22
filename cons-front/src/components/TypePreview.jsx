@@ -2,7 +2,8 @@ import ElementGlyph from './ElementGlyph'
 import { getNodeSize } from '../entities/layout'
 
 // Уменьшенный «снимок» элемента библиотеки: тот же ElementGlyph, что и
-// на холсте, только уменьшенный целиком (в том числе тумблер и индикатор).
+// на холсте (в том числе индикатор), только уменьшенный целиком и без
+// тумблера — в карточке он не кликабелен и ничего не переключает.
 export default function TypePreview({ type }) {
   const { width, height } = getNodeSize(type)
   // Высокие узлы (регистры, мультиплексор) ужимаем, чтобы карточка не разрасталась.
@@ -10,7 +11,7 @@ export default function TypePreview({ type }) {
   return (
     <div className="preview" style={{ width: width * scale, height: height * scale }}>
       <div className="preview__inner" style={{ width, height, transform: `scale(${scale})` }}>
-        <ElementGlyph type={type} on={false} />
+        <ElementGlyph type={type} on={false} preview />
       </div>
     </div>
   )

@@ -19,7 +19,10 @@ export function snap(value) {
 }
 
 const GEOMETRY = {
-  source: { width: 96, height: 48, inputs: [], outputs: [24] },
+  // У источника ниже цифрового табло ещё и тумблер-ползунок (см.
+  // ElementGlyph) — высота больше, чем у остальных «однопортовых»
+  // элементов, но вывод остаётся на той же высоте (24), что и раньше.
+  source: { width: 96, height: 84, inputs: [], outputs: [24] },
   sink: { width: 96, height: 48, inputs: [24], outputs: [] },
   gate1: { width: 96, height: 48, inputs: [24], outputs: [24] },
   gate2: { width: 96, height: 72, inputs: [24, 48], outputs: [36] },
