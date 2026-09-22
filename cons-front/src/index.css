@@ -1156,6 +1156,44 @@ button {
   color: #fff;
 }
 
+/* тумблер-ползунок под табло входа — второй способ переключить сигнал,
+   помимо клика по узлу целиком */
+.toggle {
+  position: absolute;
+  left: 37px;
+  top: 46px;
+  width: 30px;
+  height: 18px;
+  border-radius: 999px;
+  background: #fff;
+  border: var(--wire) solid var(--ink);
+  transition: background 0.12s, border-color 0.12s;
+}
+
+.toggle.is-on {
+  background: var(--live);
+  border-color: var(--live);
+}
+
+.toggle__knob {
+  position: absolute;
+  top: 50%;
+  left: 2px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--ink);
+  transform: translateY(-50%);
+  transition: transform 0.12s, background 0.12s;
+}
+
+.toggle.is-on .toggle__knob {
+  /* ширина трека минус рамки с обеих сторон (var(--wire)), минус кружок,
+     минус такой же отступ 2px справа, как слева в выключенном состоянии */
+  transform: translate(10.8px, -50%);
+  background: #fff;
+}
+
 /* подпись входа/выхода (A, B, F…) */
 .node__name {
   position: absolute;
