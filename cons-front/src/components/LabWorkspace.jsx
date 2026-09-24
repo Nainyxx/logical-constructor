@@ -5,19 +5,15 @@ import MethodologyPanel from './MethodologyPanel'
 import { useCircuitState } from '../hooks/useCircuitState'
 import { getLab } from '../entities/labs'
 
-// Экран одной лабораторной работы: библиотека слева, холст с вкладками
-// посередине, методичка справа. У каждого из трёх заданий — свой
-// независимый холст: переключение вкладок не стирает то, что собрано на
-// соседней. Ровно три задания есть у каждой работы, поэтому хуки
-// состояния можно завести один раз, без условий.
+// экран лабы: библиотека, холст с вкладками заданий, методичка. у каждой вкладки свой холст
 export default function LabWorkspace({ number, onBack }) {
   const lab = getLab(number)
   const [activeTab, setActiveTab] = useState(0)
   const [showMethodology, setShowMethodology] = useState(true)
 
-  const task0 = useCircuitState()
-  const task1 = useCircuitState()
-  const task2 = useCircuitState()
+  const task0 = useCircuitState(`lab:${lab.number}:0`)
+  const task1 = useCircuitState(`lab:${lab.number}:1`)
+  const task2 = useCircuitState(`lab:${lab.number}:2`)
   const activeCircuit = [task0, task1, task2][activeTab]
 
   return (

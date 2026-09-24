@@ -1,13 +1,22 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { ELEMENT_TYPES } from '../entities/elementTypes'
 import { evaluateCircuit } from '../entities/circuit'
+import { loadCircuit, saveCircuit } from '../entities/storage'
 
 let nextId = 1
 const makeId = (prefix) => `${prefix}-${nextId++}`
 
-// Автоподпись для новых входов/выходов: A, B, C… и F, G, H… — так
-// пользователю почти никогда не приходится переименовывать элемент
-// самому, только когда лаба требует конкретное имя (S, P, Q и т.п.).
+// сдвигаем счётчик id за восстановленные из localStorage узлы/провода
+function bumpIdCounter(nodes, wires) {
+  let max = 0
+  for (const { id } of [...nodes, ...wires]) {
+    const n = Number(id.slice(id.lastIndexOf('-') + 1))
+    if (Number.isFinite(n)) max = Math.max(max, n)
+  }
+  if (max >= nextId) nextId = max + 1
+}
+
+// автоподпись новых входов/выходов: A, B, C… и F, G, H…
 function nextLabel(typeId, existingNodes) {
   const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
   const start = typeId === 'OUTPUT' ? 5 : 0 // выходы начинаются с F
@@ -26,14 +35,15 @@ function statesEqual(a, b) {
   return keys.every((key) => a[key] === b[key])
 }
 
-/**
- * Хранит состояние схемы (узлы + провода) и даёт действия для его
- * изменения. Возвращает также уже посчитанные значения выходов —
- * компонентам не нужно самим запускать evaluateCircuit.
- */
-export function useCircuitState() {
-  const [nodes, setNodes] = useState([])
-  const [wires, setWires] = useState([])
+// состояние схемы (узлы+провода) + вычисленные значения. storageKey —
+// ключ автосохранения в localStorage (свой у каждой лабы/задания/свободного режима)
+export function useCircuitState(storageKey) {
+  const [nodes, setNodes] = useState(() => {
+    const saved = storageKey ? loadCircuit(storageKey) : null
+    if (saved) bumpIdCounter(saved.nodes, saved.wires)
+    return saved?.nodes ?? []
+  })
+  const [wires, setWires] = useState(() => (storageKey ? loadCircuit(storageKey)?.wires ?? [] : []))
 
   const addNode = useCallback((typeId, x, y) => {
     const id = makeId(typeId)
@@ -63,11 +73,7 @@ export function useCircuitState() {
     setNodes((prev) => prev.map((node) => (node.id === id ? { ...node, on: !node.on } : node)))
   }, [])
 
-  // Один вход может принять только один провод — новое соединение
-  // вытесняет старое, если оно было в этот же порт. Узел на самого себя
-  // заводить можно и нужно (обратная связь триггера, T-триггер из
-  // D-триггера с Q' на D) — цикл в схеме безопасно обрабатывает сам
-  // evaluateCircuit (см. inProgress в entities/circuit.js).
+  // новое соединение вытесняет старое на том же входе; узел на себя (T-триггер) — можно
   const connect = useCallback((fromNodeId, fromPort, toNodeId, toPort) => {
     setWires((prev) => [
       ...prev.filter((wire) => !(wire.toNodeId === toNodeId && wire.toPort === toPort)),
@@ -84,11 +90,13 @@ export function useCircuitState() {
     setWires([])
   }, [])
 
-  // Комбинационная обратная связь (RS-триггер на двух «ИЛИ-НЕ», без
-  // отдельного элемента памяти) держит значение между пересчётами схемы
-  // не сама по себе — её "прошлое" нужно передавать явно. Этот ref несёт
-  // результат предыдущего вызова в evaluateCircuit как отправную точку
-  // для узлов внутри цикла (см. entities/circuit.js).
+  // сохраняем при каждом изменении схемы
+  useEffect(() => {
+    if (storageKey) saveCircuit(storageKey, nodes, wires)
+  }, [storageKey, nodes, wires])
+
+  // затравка для evaluateCircuit — комбинационная обратная связь держит
+  // значение только если её передать явно (см. entities/circuit.js)
   const previousValuesRef = useRef(new Map())
 
   const { values, nextStates } = useMemo(() => {
@@ -97,12 +105,7 @@ export function useCircuitState() {
     return result
   }, [nodes, wires])
 
-  // Триггеры и ячейки памяти хранят своё состояние в самом узле, а не
-  // выводят его заново из текущих входов. Как только вычисленное
-  // состояние отличается от сохранённого, переносим его в узел — это и
-  // есть следующий "такт" схемы (как в реальной защёлке, реагирующей на
-  // изменение входов). Сравнение перед записью не даёт зациклиться:
-  // когда состояние уже совпадает, повторный рендер не запускается.
+  // переносим вычисленное состояние триггеров в узел — следующий "такт" схемы
   useEffect(() => {
     if (nextStates.size === 0) return
     setNodes((prev) => {

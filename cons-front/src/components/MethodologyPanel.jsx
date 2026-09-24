@@ -3,11 +3,7 @@ import ReferenceGlyph from './ReferenceGlyph'
 import { ELEMENT_TYPES } from '../entities/elementTypes'
 import { buildTruthTable } from '../entities/truthTable'
 
-// Правая панель — методичка лабораторной работы: цель, краткая теория
-// по нужным для неё элементам (значок и таблица истинности вентилей
-// строятся автоматически по самому элементу — методичка не может
-// разойтись с тем, что реально считает схема), тренировочный пример и
-// список заданий. Клик по заданию переключает вкладку холста на него.
+// методичка справа: теория, тренировочный пример, задания — клик по заданию переключает вкладку
 export default function MethodologyPanel({ lab, activeTab, onSelectTab, onClose }) {
   const { example } = lab
 
@@ -125,9 +121,7 @@ function gateTruthTable(type) {
   return { headers, rows, inputCols: type.inputCount }
 }
 
-// Подсвечиваем зелёным только значения 1 в столбцах ВЫХОДОВ — иначе
-// единицы во входных столбцах (которые просто перечисляют все наборы
-// сигналов) выглядели бы как «интересный», особенный результат.
+// подсвечиваем 1 только в столбцах выходов, не входов
 function RefTable({ table }) {
   const inputCols = table.inputCols ?? 0
   return (

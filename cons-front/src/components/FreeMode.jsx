@@ -3,12 +3,9 @@ import Workspace from './Workspace'
 import { FULL_PALETTE_GROUPS } from '../entities/elementTypes'
 import { useCircuitState } from '../hooks/useCircuitState'
 
-// Свободный режим: полная библиотека элементов слева и холст без
-// заданий и ограничений — то же рабочее место, что и в лабораторных
-// работах, просто без методички, с полным набором элементов и сразу
-// открытой таблицей истинности.
+// свободный режим: полная библиотека, без заданий и методички, таблица истинности сразу открыта
 export default function FreeMode({ onBack }) {
-  const circuit = useCircuitState()
+  const circuit = useCircuitState('free')
 
   return (
     <div className="lab">

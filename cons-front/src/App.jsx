@@ -3,9 +3,7 @@ import MainMenu from './components/MainMenu'
 import LabWorkspace from './components/LabWorkspace'
 import FreeMode from './components/FreeMode'
 
-// Три экрана приложения: каталог работ, конкретная лабораторная работа
-// и свободный режим. Роутинг — просто локальный стейт, бэкенда и
-// авторизации нет: это учебный тренажёр, открытый для всех.
+// роутинг между каталогом, лабой и свободным режимом — локальный стейт, без бэкенда
 export default function App() {
   const [screen, setScreen] = useState({ name: 'menu' })
 

@@ -1037,6 +1037,16 @@ button {
   inset: 0;
 }
 
+.glyph--preview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.glyph--preview .switch {
+  position: static;
+}
+
 .symbol {
   position: absolute;
   top: 0;
@@ -1156,8 +1166,7 @@ button {
   color: #fff;
 }
 
-/* тумблер-ползунок под табло входа — второй способ переключить сигнал,
-   помимо клика по узлу целиком */
+/* тумблер под табло входа */
 .toggle {
   position: absolute;
   left: 37px;

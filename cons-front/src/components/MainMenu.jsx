@@ -2,9 +2,7 @@ import ReferenceGlyph from './ReferenceGlyph'
 import { FULL_PALETTE_IDS } from '../entities/elementTypes'
 import { LABS } from '../entities/labs'
 
-// Каталог: пять лабораторных работ по методичкам и свободный режим.
-// На карточке — значки узлов, которые изучаются в работе (те же ГОСТ-значки,
-// что и в тренажёре и в методичке).
+// каталог: пять лаб + свободный режим, на карточках — значки изучаемых узлов
 export default function MainMenu({ onOpenLab, onOpenFree }) {
   return (
     <div className="menu">

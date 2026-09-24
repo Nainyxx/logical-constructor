@@ -1,29 +1,27 @@
 import BoxSymbol from './BoxSymbol'
 import { boxOfType } from '../entities/symbols'
 
-// Визуальное "тело" элемента: УГО по ГОСТ для вентилей и триггеров
-// (BoxSymbol), цифровое табло + тумблер-ползунок для входа, круглый
-// индикатор для выхода.
-//
-// У табло, тумблера и индикатора фиксированный размер, а узел лишь
-// позиционирует их: вывод-провод слева/справа заканчивается ровно на
-// порте узла. Переключают вход и клик по всему узлу (см. Workspace —
-// клик без перетаскивания), и клик по самому тумблеру: оба попадают в
-// одну и ту же область узла, поэтому отдельный обработчик не нужен.
-//
-// preview — рисуем статичный "снимок" для карточки библиотеки: без
-// тумблера, он там не нужен (не кликабелен, не отражает реальный сигнал).
+// тело элемента: ГОСТ-значок (BoxSymbol) для вентилей, табло+тумблер для
+// входа, индикатор для выхода. preview — статичный снимок для библиотеки, без тумблера
 export default function ElementGlyph({ type, on, scale = 1, preview = false }) {
   if (type.kind === 'source') {
+    // в узле табло стоит вровень с выводом (см. layout.js) и не по центру
+    // коробки — для превью библиотеки это выглядело бы сдвинутым, поэтому
+    // превью просто центрирует табло флексом, без вывода и тумблера
+    if (preview) {
+      return (
+        <div className="glyph glyph--preview">
+          <span className="switch">0</span>
+        </div>
+      )
+    }
     return (
       <div className="glyph glyph--source">
         <span className={`switch ${on ? 'is-on' : ''}`}>{on ? 1 : 0}</span>
         <span className={`lead lead--right ${on ? 'is-on' : ''}`} />
-        {!preview && (
-          <span className={`toggle ${on ? 'is-on' : ''}`}>
-            <span className="toggle__knob" />
-          </span>
-        )}
+        <span className={`toggle ${on ? 'is-on' : ''}`}>
+          <span className="toggle__knob" />
+        </span>
       </div>
     )
   }

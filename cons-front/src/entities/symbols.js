@@ -1,12 +1,4 @@
-// Описание условных графических обозначений (УГО) по ГОСТ 2.743-91:
-// прямоугольный корпус, выводы слева (входы) и справа (выходы), в верхней
-// части корпуса — обозначение функции («&», «≥1», «=1», «1») или тип узла
-// (HS, SM, DC, RG…), внутри у выводов — метки (D, C, S, P или номера
-// разрядов). Кружок на выводе — инверсия, треугольник — динамический
-// (срабатывающий по фронту) вход.
-//
-// Описание — обычные данные, из них BoxSymbol рисует значок. Одним и тем
-// же кодом рисуются и вентили на холсте, и карточки узлов в методичке.
+// описание УГО по ГОСТ 2.743-91 — данные для BoxSymbol (один код рисует и холст, и методичку)
 //
 // box = {
 //   width, height,
@@ -21,8 +13,7 @@ import { LEAD, boxGeometry, getInputPortPosition, getNodeSize, getOutputPortPosi
 
 const cache = new Map()
 
-// Значок элемента библиотеки (вентиль или функциональный узел) — в точности
-// по геометрии узла, поэтому выводы значка совпадают с портами на холсте.
+// значок по геометрии узла — выводы совпадают с портами на холсте
 export function boxOfType(type) {
   if (cache.has(type.id)) return cache.get(type.id)
 
@@ -30,7 +21,7 @@ export function boxOfType(type) {
   if (type.box) {
     box = autoBox({ ...type.box, inputs: type.pins.inputs, outputs: type.pins.outputs })
   } else {
-    // Вентиль: корпус чуть ниже крайних выводов, обозначение по центру.
+    // вентиль: корпус чуть ниже крайних выводов, обозначение по центру
     const { width, height } = getNodeSize(type)
     const margin = height === 48 ? 4 : 6
     box = {
@@ -51,8 +42,7 @@ export function boxOfType(type) {
   return box
 }
 
-// Значок функционального узла: выводы раскладываются автоматически по
-// списку — так HS, SM, DC, MUX… не надо рисовать руками (см. boxGeometry).
+// значок функционального узла — выводы раскладываются автоматически (см. boxGeometry)
 //   spec = { title, subtitle?, wide?, inputs: [pin], outputs: [pin] }
 //   pin  = 'A' | { name, label?, dynamic?, inverted?, overline? }
 export function autoBox(spec) {
