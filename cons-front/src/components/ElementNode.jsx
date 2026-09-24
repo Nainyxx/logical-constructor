@@ -4,9 +4,7 @@ import Name from './Name'
 import Port from './Port'
 import { getInputPortPosition, getNodeSize, getOutputPortPosition } from '../entities/layout'
 
-// Один элемент, размещённый на холсте: тело + его порты + подпись.
-// Перетаскивание и подключение проводов обрабатывает Workspace —
-// узел только сообщает о начале жеста.
+// элемент на холсте: тело + порты + подпись; жесты обрабатывает Workspace
 export default function ElementNode({ node, value, connectedInputs, connectedOutputs, onStartMove, onStartWire, onRemove, onRename }) {
   const { type } = node
   const size = getNodeSize(type)
@@ -64,9 +62,7 @@ export default function ElementNode({ node, value, connectedInputs, connectedOut
   )
 }
 
-// Имя входа/выхода (A, B, F…) — по умолчанию подставляется автоматически,
-// но лабораторные работы требуют конкретное имя (S, P, Q0, D1…), поэтому
-// подпись можно переименовать прямым кликом. «!Q» — Q с чертой.
+// имя входа/выхода — автоподпись, но переименовывается кликом (лабы требуют S, P, Q0…)
 function NodeName({ side, value, placeholder, onCommit }) {
   const [editing, setEditing] = useState(false)
   const [draft, setDraft] = useState(value)

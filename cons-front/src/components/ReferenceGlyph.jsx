@@ -2,9 +2,7 @@ import BoxSymbol from './BoxSymbol'
 import { ELEMENT_TYPES } from '../entities/elementTypes'
 import { autoBox, boxOfType } from '../entities/symbols'
 
-// Значок карточки теории: готовый вентиль (gateId) или функциональный
-// узел (box) — тот же ГОСТ-значок, что и на холсте. maxHeight ужимает
-// значок, если высокий узел (MUX, RG) не помещается в отведённое место.
+// значок для карточки теории — тот же ГОСТ-символ, что и на холсте
 export default function ReferenceGlyph({ item, scale = 1, maxHeight }) {
   const box = item.gateId ? boxOfType(ELEMENT_TYPES[item.gateId]) : item.box ? autoBox(item.box) : null
   if (!box) return null

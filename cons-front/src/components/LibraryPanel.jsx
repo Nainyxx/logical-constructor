@@ -1,10 +1,8 @@
+import { useRef } from 'react'
 import { ELEMENT_TYPES } from '../entities/elementTypes'
 import TypePreview from './TypePreview'
 
-// Левая панель — библиотека элементов, из которой их перетаскивают на
-// холст. В лабораторных работах — плоский список уже изученных к этому
-// моменту элементов (см. entities/labs.js, paletteIds); в свободном
-// режиме — полный набор, разбитый на группы с заголовками (groups).
+// библиотека элементов слева: плоский список в лабах (paletteIds), группы в свободном режиме
 export default function LibraryPanel({ elementIds, groups }) {
   const sections = groups ?? [{ title: null, ids: elementIds }]
 
@@ -29,14 +27,22 @@ export default function LibraryPanel({ elementIds, groups }) {
 }
 
 function LibraryItem({ type }) {
+  const glyphRef = useRef(null)
+
+  // без setDragImage браузер тащит снимок всей карточки (с текстом) — вместо
+  // этого под курсором едет только значок
   function handleDragStart(e) {
     e.dataTransfer.setData('text/x-element-type', type.id)
     e.dataTransfer.effectAllowed = 'copy'
+    if (glyphRef.current) {
+      const { width, height } = glyphRef.current.getBoundingClientRect()
+      e.dataTransfer.setDragImage(glyphRef.current, width / 2, height / 2)
+    }
   }
 
   return (
     <div className="library-item" draggable onDragStart={handleDragStart}>
-      <div className="library-item__glyph">
+      <div className="library-item__glyph" ref={glyphRef}>
         <TypePreview type={type} />
       </div>
       <div className="library-item__text">

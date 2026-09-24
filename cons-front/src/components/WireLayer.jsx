@@ -1,15 +1,8 @@
 import { WORLD_SIZE, getInputPortPosition, getOutputPortPosition } from '../entities/layout'
 import { assignTrunks, pathMidpoint, pointsToPath, routePoints } from '../entities/wireRouting'
 
-// SVG-слой поверх всех узлов, рисующий провода между портами и
-// "черновой" провод во время перетаскивания нового соединения.
-//
-// У каждого провода два наложенных path: тонкий видимый и толстый
-// прозрачный "hit" поверх него — так провод легко подцепить курсором,
-// не попадая точно в линию толщиной в пару пикселей.
-//
-// Если от одного выхода отходит больше одного провода, в точке общего
-// ветвления рисуется точка-узел — как на схемах в методичках.
+// SVG-слой проводов: у каждого — тонкий видимый path + толстый прозрачный
+// hit-path поверх, чтобы легче попадать курсором. Точка-узел — на ветвлении.
 export default function WireLayer({ nodes, wires, values, draftWire, onDeleteWire }) {
   const nodeById = new Map(nodes.map((node) => [node.id, node]))
 
@@ -27,7 +20,7 @@ export default function WireLayer({ nodes, wires, values, draftWire, onDeleteWir
     return { x: node.x + pos.x, y: node.y + pos.y }
   }
 
-  // Сначала собираем провода по выходам, затем раздаём выходам шины (см. assignTrunks).
+  // группируем провода по выходам, затем раздаём шины (assignTrunks)
   const outputs = new Map() // "узел:порт" -> { key, from, ys, live }
   const resolved = wires
     .map((wire) => {

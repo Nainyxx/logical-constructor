@@ -11,16 +11,7 @@ const MAX_SCALE = 2.5
 const FIT_MAX_SCALE = 1.25 // «Вся схема» не должна раздувать маленькую схему на весь экран
 const CLICK_THRESHOLD = 4 // px — меньше — считаем это кликом, а не перетаскиванием
 
-/**
- * Бесконечное (в пределах WORLD_SIZE) рабочее поле в клетку.
- * Отвечает за:
- *  - панорамирование и зум поля,
- *  - перетаскивание элементов из палитры (drop),
- *  - перемещение уже размещённых элементов,
- *  - протягивание проводов между портами.
- * Всё это — разные фазы одного и того же жеста "нажал — потянул —
- * отпустил", поэтому они собраны в один reducer-подобный interactionRef.
- */
+// рабочее поле: пан/зум, drop из палитры, перетаскивание узлов, протяжка проводов
 export default function Workspace({
   nodes,
   wires,
@@ -43,23 +34,17 @@ export default function Workspace({
   const [showTable, setShowTable] = useState(tableOpenByDefault)
   const [showHelp, setShowHelp] = useState(false)
 
-  // Слушатели на window вешаются один раз (см. эффект ниже) и не должны
-  // пересоздаваться при каждом кадре перетаскивания — поэтому читают
-  // актуальные пропсы/состояние через этот ref, а не из замыкания.
+  // слушатели на window стабильны (см. эффект ниже) — читают актуальные
+  // пропсы через ref, а не из замыкания
   const latestRef = useRef(null)
   latestRef.current = { view, nodes, moveNode, toggleInput, connect }
 
-  // Центрируем видимую область поля при первом рендере.
-  // Если на этой вкладке уже что-то собрано (переключились с другой
-  // вкладки) — сразу вписываем схему в экран, а не показываем пустой центр.
+  // вписываем схему в экран при первом рендере
   useLayoutEffect(() => {
     fitToView()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  // Читает view из latestRef, а не из замыкания рендера — эту функцию
-  // вызывают и стабильные обработчики на window (см. эффект ниже),
-  // которым нужен всегда самый свежий масштаб/сдвиг поля.
   function screenToWorld(clientX, clientY) {
     const { view } = latestRef.current
     const rect = containerRef.current.getBoundingClientRect()
@@ -69,11 +54,7 @@ export default function Workspace({
     }
   }
 
-  // На компактных вентилях с двумя входами кликабельные зоны соседних
-  // портов (увеличенные — см. .port__hit) перекрываются сильнее, чем
-  // расстояние между самими портами. Поэтому среди всех входов под
-  // курсором берём не первый попавшийся в DOM, а тот, чей центр
-  // физически ближе всего к точке отпускания.
+  // берём ближайший к курсору порт, а не первый в DOM — .port__hit у соседних портов перекрываются
   function findInputPortAt(clientX, clientY) {
     const candidates = document
       .elementsFromPoint(clientX, clientY)
@@ -127,8 +108,7 @@ export default function Workspace({
     setDraftWire({ fromNodeId: nodeId, fromPort: portIndex, x: world.x, y: world.y })
   }
 
-  // --- продолжение и завершение жестов (слушатели на window,
-  //     чтобы жест не срывался, если курсор ушёл с элемента) ---------
+  // --- продолжение/завершение жеста — слушатели на window, чтобы не срывалось за краем узла ---
 
   useEffect(() => {
     function handlePointerMove(e) {
@@ -180,8 +160,7 @@ export default function Workspace({
     }
   }, [])
 
-  // Колесо мыши — зум к точке под курсором. Подключаем нативно,
-  // чтобы можно было отменить прокрутку страницы (preventDefault).
+  // зум к курсору колесом; слушатель нативный, чтобы работал preventDefault
   useEffect(() => {
     const el = containerRef.current
     function handleWheel(e) {
@@ -252,7 +231,7 @@ export default function Workspace({
     addNode(typeId, snap(world.x - size.width / 2), snap(world.y - size.height / 2))
   }
 
-  // Подключённость портов: для статуса внизу и для подсветки самих портов.
+  // подключённость портов — для статуса внизу и подсветки самих портов
   const { connections, freeInputs } = useMemo(() => {
     const map = new Map(nodes.map((n) => [n.id, { inputs: new Set(), outputs: new Set() }]))
     wires.forEach((w) => {
