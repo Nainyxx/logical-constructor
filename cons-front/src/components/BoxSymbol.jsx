@@ -2,6 +2,7 @@
 
 const R = 4 // радиус кружка инверсии
 const TRI = 6 // полувысота треугольника динамического входа
+const PIN_GAP = 9 // отступ подписи вывода от вертикальной линии корпуса
 
 export default function BoxSymbol({ box, scale = 1, pad = 0, className = '' }) {
   const { width, height, body, title, titleY, subtitle, inputs, outputs } = box
@@ -51,12 +52,12 @@ export default function BoxSymbol({ box, scale = 1, pad = 0, className = '' }) {
       {inputs.map((pin, i) => (
         <g key={`it-${i}`}>
           {pin.label && (
-            <text className="symbol__pin" x={body.x1 + (pin.dynamic ? TRI + 7 : 6)} y={pin.y} textAnchor="start">
+            <text className="symbol__pin" x={body.x1 + (pin.dynamic ? TRI + PIN_GAP + 1 : PIN_GAP)} y={pin.y} textAnchor="start">
               {pin.label}
             </text>
           )}
           {pin.name && (
-            <text className="symbol__name" x={-5} y={pin.y} textAnchor="end">
+            <text className="symbol__name" x={-7} y={pin.y} textAnchor="end">
               {pin.name}
             </text>
           )}
@@ -67,7 +68,7 @@ export default function BoxSymbol({ box, scale = 1, pad = 0, className = '' }) {
           {pin.label && (
             <text
               className={`symbol__pin ${pin.overline ? 'is-overline' : ''}`}
-              x={body.x2 - 6}
+              x={body.x2 - PIN_GAP}
               y={pin.y}
               textAnchor="end"
             >
@@ -77,7 +78,7 @@ export default function BoxSymbol({ box, scale = 1, pad = 0, className = '' }) {
           {pin.name && (
             <text
               className={`symbol__name ${pin.overline ? 'is-overline' : ''}`}
-              x={width + 5}
+              x={width + 7}
               y={pin.y}
               textAnchor="start"
             >
