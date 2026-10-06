@@ -83,3 +83,25 @@ export function pathMidpoint(points) {
   }
   return points[0]
 }
+
+// ближайшая к target точка на ломаной — нужна, чтобы потянуть новое ответвление
+// от места клика на проводе, а не от исходного порта
+export function nearestPointOnPath(points, target) {
+  let best = points[0]
+  let bestDist = Infinity
+  for (let i = 1; i < points.length; i++) {
+    const p0 = points[i - 1]
+    const p1 = points[i]
+    const dx = p1.x - p0.x
+    const dy = p1.y - p0.y
+    const lenSq = dx * dx + dy * dy
+    const t = lenSq ? Math.max(0, Math.min(1, ((target.x - p0.x) * dx + (target.y - p0.y) * dy) / lenSq)) : 0
+    const point = { x: p0.x + dx * t, y: p0.y + dy * t }
+    const dist = Math.hypot(point.x - target.x, point.y - target.y)
+    if (dist < bestDist) {
+      bestDist = dist
+      best = point
+    }
+  }
+  return best
+}

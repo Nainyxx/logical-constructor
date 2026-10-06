@@ -1,20 +1,53 @@
+/* три тёмные "компьютерные" темы — terminal (по умолчанию, задаёт базовые
+   значения токенов прямо в :root), pcb и retro переопределяют их через
+   [data-theme]. Переключаются ThemeSwitch.jsx, который пишет атрибут на
+   <html> и сохраняет выбор в localStorage */
 :root {
-  --ink: #14171f;
-  --muted: #5b6472;
-  --faint: #8a93a3;
-  --line: #d3d9e2;
-  --panel: #f4f6f9;
-  --surface: #ffffff;
-  --accent: #1f5fd6;
-  --accent-soft: rgba(31, 95, 214, 0.09);
-  --live: #15a34a;
-  --live-soft: rgba(21, 163, 74, 0.13);
-  --danger: #d92d20;
+  --bg: #0b0e12;
+  --panel: #121823;
+  --surface: #161d27;
+  --ink: #d8ffe8;
+  --muted: #8fae9d;
+  --faint: #5c7568;
+  --line: rgba(57, 255, 136, 0.18);
+  --accent: #39ff88;
+  --accent-soft: rgba(57, 255, 136, 0.12);
+  --symbol-fill: #1b2430;
+  --live: #2ee673;
+  --live-soft: rgba(46, 230, 115, 0.16);
+  --danger: #ff5c5c;
   --wire: 1.6px;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'Fira Code', Consolas, monospace;
 
-  color-scheme: light;
+  color-scheme: dark;
   font: 15px/1.45 system-ui, 'Segoe UI', Roboto, 'Noto Sans', sans-serif;
   color: var(--ink);
+}
+
+:root[data-theme='pcb'] {
+  --bg: #0d1420;
+  --panel: #141d2e;
+  --surface: #182238;
+  --ink: #dce6f5;
+  --muted: #8fa3c4;
+  --faint: #5c6f8f;
+  --line: rgba(74, 216, 216, 0.16);
+  --accent: #4ad8d8;
+  --accent-soft: rgba(74, 216, 216, 0.12);
+  --symbol-fill: #1b2740;
+}
+
+:root[data-theme='retro'] {
+  --bg: #0a0a0a;
+  --panel: #161616;
+  --surface: #1c1c1c;
+  --ink: #ffe8bf;
+  --muted: #b89a73;
+  --faint: #7a6648;
+  --line: rgba(255, 176, 0, 0.18);
+  --accent: #ffb000;
+  --accent-soft: rgba(255, 176, 0, 0.12);
+  --symbol-fill: #201a10;
 }
 
 * {
@@ -24,7 +57,7 @@
 body {
   margin: 0;
   overflow: hidden;
-  background: var(--panel);
+  background: var(--bg);
 }
 
 #root {
@@ -87,6 +120,17 @@ button {
   margin: 0 auto 32px;
 }
 
+.menu__kicker {
+  display: block;
+  margin: 0 0 10px;
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
 .menu__header h1 {
   margin: 0 0 10px;
   font-size: 32px;
@@ -109,6 +153,7 @@ button {
 }
 
 .lab-card {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -120,6 +165,43 @@ button {
   text-align: left;
   cursor: pointer;
   transition: border-color 0.12s, box-shadow 0.12s;
+}
+
+.lab-card__top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+}
+
+.lab-card__download {
+  padding: 3px 9px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 600;
+  font-family: var(--font-mono);
+  text-decoration: none;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.lab-card__download:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.menu__downloads {
+  display: flex;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.menu__downloads .btn {
+  text-decoration: none;
 }
 
 .lab-card:hover {
@@ -146,6 +228,7 @@ button {
   color: var(--muted);
   font-size: 12px;
   font-weight: 600;
+  font-family: var(--font-mono);
 }
 
 .lab-card__badge--accent {
@@ -409,7 +492,7 @@ button {
   margin: 0 0 8px;
   font-size: 13px;
   line-height: 1.55;
-  color: #303744;
+  color: var(--muted);
 }
 
 .methodology__caption {
@@ -456,7 +539,7 @@ button {
   margin: 0 0 8px;
   font-size: 12.5px;
   line-height: 1.5;
-  color: #303744;
+  color: var(--muted);
 }
 
 .ref-card__formula {
@@ -487,7 +570,7 @@ button {
 }
 
 .ref-table td.is-true {
-  color: #0f7a37;
+  color: var(--live);
   font-weight: 700;
   background: var(--live-soft);
 }
@@ -508,7 +591,7 @@ button {
   padding-left: 20px;
   font-size: 13px;
   line-height: 1.55;
-  color: #303744;
+  color: var(--muted);
 }
 
 .step-list {
@@ -525,7 +608,7 @@ button {
   gap: 10px;
   font-size: 13px;
   line-height: 1.5;
-  color: #303744;
+  color: var(--muted);
 }
 
 .step-list__num {
@@ -535,7 +618,7 @@ button {
   margin-top: 1px;
   border-radius: 50%;
   background: var(--accent);
-  color: #fff;
+  color: var(--bg);
   font-size: 11px;
   font-weight: 700;
   display: flex;
@@ -591,7 +674,7 @@ button {
 
 .task-card.is-active .task-card__num {
   background: var(--accent);
-  color: #fff;
+  color: var(--bg);
 }
 
 .task-card__formula {
@@ -609,7 +692,7 @@ button {
   padding: 0 14px 14px;
   font-size: 12.5px;
   line-height: 1.55;
-  color: #303744;
+  color: var(--muted);
 }
 
 .task-card__body p {
@@ -660,12 +743,12 @@ button {
   position: absolute;
   top: 0;
   left: 0;
-  background-color: #fff;
+  background-color: var(--bg);
   background-image:
-    linear-gradient(to right, #dfe4ec 1px, transparent 1px),
-    linear-gradient(to bottom, #dfe4ec 1px, transparent 1px),
-    linear-gradient(to right, #eff2f7 1px, transparent 1px),
-    linear-gradient(to bottom, #eff2f7 1px, transparent 1px);
+    linear-gradient(to right, color-mix(in srgb, var(--accent) 22%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in srgb, var(--accent) 22%, transparent) 1px, transparent 1px),
+    linear-gradient(to right, color-mix(in srgb, var(--accent) 9%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in srgb, var(--accent) 9%, transparent) 1px, transparent 1px);
   background-size: 60px 60px, 60px 60px, 12px 12px, 12px 12px;
 }
 
@@ -695,7 +778,7 @@ button {
   height: 64px;
   border: 2px dashed var(--faint);
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.85);
+  background: var(--surface);
 }
 
 .workspace__empty-icon::before {
@@ -780,7 +863,7 @@ button {
 }
 
 .wire-marker circle {
-  fill: #fff;
+  fill: var(--surface);
   stroke: var(--danger);
   stroke-width: 1.6;
 }
@@ -845,7 +928,7 @@ button {
 }
 
 .ttable__table td.is-true {
-  color: #0f7a37;
+  color: var(--live);
   font-weight: 700;
   background: var(--live-soft);
 }
@@ -895,6 +978,7 @@ button {
   text-align: center;
   color: var(--muted);
   font-variant-numeric: tabular-nums;
+  font-family: var(--font-mono);
 }
 
 .workspace__toolbar-btn {
@@ -945,7 +1029,7 @@ button {
 }
 
 .workspace__status.is-ready {
-  color: #0f7a37;
+  color: var(--live);
 }
 
 .workspace__status.is-ready .workspace__status-dot {
@@ -973,7 +1057,7 @@ button {
   padding: 0;
   border-radius: 50%;
   border: 1px solid var(--line);
-  background: #fff;
+  background: var(--surface);
   color: var(--muted);
   font-size: 13px;
   opacity: 0;
@@ -1010,7 +1094,7 @@ button {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #fff;
+  background: var(--surface);
   border: 1.5px solid var(--faint);
   pointer-events: none;
   transition: transform 0.1s, border-color 0.1s;
@@ -1077,7 +1161,7 @@ button {
 
 .symbol .symbol__body,
 .symbol .symbol__bubble {
-  fill: #fff;
+  fill: var(--symbol-fill);
 }
 
 .symbol text {
@@ -1098,10 +1182,12 @@ button {
 
 .symbol__pin {
   font-size: 11.5px;
+  font-family: var(--font-mono);
 }
 
 .symbol__name {
   font-size: 12.5px;
+  font-family: var(--font-mono);
 }
 
 .symbol text.is-overline {
@@ -1137,10 +1223,11 @@ button {
   align-items: center;
   justify-content: center;
   border: var(--wire) solid var(--ink);
-  background: #fff;
+  background: var(--surface);
   font-size: 15px;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
+  font-family: var(--font-mono);
 }
 
 .switch {
@@ -1163,7 +1250,7 @@ button {
 .indicator.is-on {
   background: var(--live);
   border-color: var(--live);
-  color: #fff;
+  color: var(--bg);
 }
 
 /* тумблер под табло входа */
@@ -1174,7 +1261,7 @@ button {
   width: 30px;
   height: 18px;
   border-radius: 999px;
-  background: #fff;
+  background: var(--surface);
   border: var(--wire) solid var(--ink);
   transition: background 0.12s, border-color 0.12s;
 }
@@ -1238,7 +1325,7 @@ button.node__name:hover {
 .node__name-input {
   width: 48px;
   border: 1px solid var(--accent);
-  background: #fff;
+  background: var(--surface);
   font: inherit;
   font-size: 15px;
   font-weight: 600;
@@ -1282,4 +1369,41 @@ button.node__name:hover {
   .methodology {
     width: 300px;
   }
+}
+
+/* ---------- переключатель тем ---------- */
+
+.theme-switch {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 80;
+  display: flex;
+  gap: 2px;
+  padding: 3px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  box-shadow: 0 10px 24px -14px rgba(0, 0, 0, 0.6);
+}
+
+.theme-switch__btn {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+  font-family: var(--font-mono);
+  cursor: pointer;
+}
+
+.theme-switch__btn:hover {
+  color: var(--ink);
+}
+
+.theme-switch__btn.is-active {
+  background: var(--accent-soft);
+  color: var(--accent);
 }

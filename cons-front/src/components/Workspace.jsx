@@ -5,6 +5,7 @@ import WireLayer from './WireLayer'
 import { ELEMENT_TYPES } from '../entities/elementTypes'
 import { WORLD_SIZE, getNodeSize, snap } from '../entities/layout'
 import { buildCircuitTable } from '../entities/truthTable'
+import { nearestPointOnPath } from '../entities/wireRouting'
 
 const MIN_SCALE = 0.4
 const MAX_SCALE = 2.5
@@ -37,7 +38,7 @@ export default function Workspace({
   // слушатели на window стабильны (см. эффект ниже) — читают актуальные
   // пропсы через ref, а не из замыкания
   const latestRef = useRef(null)
-  latestRef.current = { view, nodes, moveNode, toggleInput, connect }
+  latestRef.current = { view, nodes, moveNode, toggleInput, connect, removeWire }
 
   // вписываем схему в экран при первом рендере
   useLayoutEffect(() => {
@@ -108,6 +109,22 @@ export default function Workspace({
     setDraftWire({ fromNodeId: nodeId, fromPort: portIndex, x: world.x, y: world.y })
   }
 
+  // клик по проводу — пока неясно, удаление это или начало нового ответвления
+  // (см. CLICK_THRESHOLD ниже): решаем по тому, сдвинулся ли курсор
+  function handleWirePointerDown(wire, points, e) {
+    const world = screenToWorld(e.clientX, e.clientY)
+    const start = nearestPointOnPath(points, world)
+    interactionRef.current = {
+      type: 'wire-branch-pending',
+      wire,
+      fromNodeId: wire.fromNodeId,
+      fromPort: wire.fromPort ?? 0,
+      startClientX: e.clientX,
+      startClientY: e.clientY,
+    }
+    setDraftWire({ fromNodeId: wire.fromNodeId, fromPort: wire.fromPort ?? 0, from: start, x: start.x, y: start.y })
+  }
+
   // --- продолжение/завершение жеста — слушатели на window, чтобы не срывалось за краем узла ---
 
   useEffect(() => {
@@ -130,13 +147,21 @@ export default function Workspace({
       } else if (interaction.type === 'wire') {
         const world = screenToWorld(e.clientX, e.clientY)
         setDraftWire((d) => d && { ...d, x: world.x, y: world.y })
+      } else if (interaction.type === 'wire-branch-pending') {
+        const dx = e.clientX - interaction.startClientX
+        const dy = e.clientY - interaction.startClientY
+        if (Math.abs(dx) > CLICK_THRESHOLD || Math.abs(dy) > CLICK_THRESHOLD) {
+          interaction.type = 'wire' // курсор сдвинулся — это не клик, а протяжка нового ответвления
+        }
+        const world = screenToWorld(e.clientX, e.clientY)
+        setDraftWire((d) => d && { ...d, x: world.x, y: world.y })
       }
     }
 
     function handlePointerUp(e) {
       const interaction = interactionRef.current
       if (!interaction) return
-      const { nodes, toggleInput, connect } = latestRef.current
+      const { nodes, toggleInput, connect, removeWire } = latestRef.current
 
       if (interaction.type === 'move-node' && !interaction.moved) {
         const node = nodes.find((n) => n.id === interaction.nodeId)
@@ -146,6 +171,12 @@ export default function Workspace({
       if (interaction.type === 'wire') {
         const target = findInputPortAt(e.clientX, e.clientY)
         if (target) connect(interaction.fromNodeId, interaction.fromPort, target.nodeId, target.portIndex)
+        setDraftWire(null)
+      }
+
+      if (interaction.type === 'wire-branch-pending') {
+        // курсор не сдвинулся — это был обычный клик по проводу, удаляем как раньше
+        removeWire(interaction.wire.id)
         setDraftWire(null)
       }
 
@@ -273,7 +304,13 @@ export default function Workspace({
         >
           <div className="workspace__grid" style={{ width: WORLD_SIZE, height: WORLD_SIZE }} />
 
-          <WireLayer nodes={nodes} wires={wires} values={values} draftWire={draftWire} onDeleteWire={removeWire} />
+          <WireLayer
+            nodes={nodes}
+            wires={wires}
+            values={values}
+            draftWire={draftWire}
+            onWirePointerDown={handleWirePointerDown}
+          />
 
           {nodes.map((node) => (
             <ElementNode

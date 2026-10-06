@@ -3,7 +3,9 @@ import { assignTrunks, pathMidpoint, pointsToPath, routePoints } from '../entiti
 
 // SVG-слой проводов: у каждого — тонкий видимый path + толстый прозрачный
 // hit-path поверх, чтобы легче попадать курсором. Точка-узел — на ветвлении.
-export default function WireLayer({ nodes, wires, values, draftWire, onDeleteWire }) {
+// Клик по hit-path удаляет провод; зажать-и-потянуть — новое ответвление от
+// того же источника (см. Workspace.jsx: 'wire-branch-pending' -> 'wire').
+export default function WireLayer({ nodes, wires, values, draftWire, onWirePointerDown }) {
   const nodeById = new Map(nodes.map((node) => [node.id, node]))
 
   function outputPoint(nodeId, portIndex = 0) {
@@ -59,7 +61,7 @@ export default function WireLayer({ nodes, wires, values, draftWire, onDeleteWir
               className="wire-hit"
               onPointerDown={(e) => {
                 e.stopPropagation()
-                onDeleteWire(wire.id)
+                onWirePointerDown(wire, points, e)
               }}
             />
             <path d={d} className={`wire-visible ${live ? 'is-live' : ''}`} />
@@ -83,7 +85,9 @@ export default function WireLayer({ nodes, wires, values, draftWire, onDeleteWir
 
       {draftWire &&
         (() => {
-          const from = outputPoint(draftWire.fromNodeId, draftWire.fromPort ?? 0)
+          // branch-драфт (от середины существующего провода) несёт готовую from-точку;
+          // обычный драфт от порта — считаем её по fromNodeId/fromPort
+          const from = draftWire.from ?? outputPoint(draftWire.fromNodeId, draftWire.fromPort ?? 0)
           if (!from) return null
           return <path d={pointsToPath(routePoints(from, draftWire))} className="wire-visible wire--draft" />
         })()}
