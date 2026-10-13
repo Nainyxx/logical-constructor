@@ -1,7 +1,7 @@
-/* три тёмные "компьютерные" темы — terminal (по умолчанию, задаёт базовые
-   значения токенов прямо в :root), pcb и retro переопределяют их через
-   [data-theme]. Переключаются ThemeSwitch.jsx, который пишет атрибут на
-   <html> и сохраняет выбор в localStorage */
+/* четыре темы — terminal (по умолчанию, задаёт базовые значения токенов
+   прямо в :root), pcb, retro и light переопределяют их через [data-theme].
+   Переключаются ThemeSwitch.jsx, который пишет атрибут на <html> и
+   сохраняет выбор в localStorage */
 :root {
   --bg: #0b0e12;
   --panel: #121823;
@@ -48,6 +48,24 @@
   --accent: #ffb000;
   --accent-soft: rgba(255, 176, 0, 0.12);
   --symbol-fill: #201a10;
+}
+
+:root[data-theme='light'] {
+  --bg: #eef1f6;
+  --panel: #f4f6f9;
+  --surface: #ffffff;
+  --ink: #14171f;
+  --muted: #5b6472;
+  --faint: #8a93a3;
+  --line: #d3d9e2;
+  --accent: #1f5fd6;
+  --accent-soft: rgba(31, 95, 214, 0.09);
+  --symbol-fill: #ffffff;
+  --live: #15a34a;
+  --live-soft: rgba(21, 163, 74, 0.13);
+  --danger: #d92d20;
+
+  color-scheme: light;
 }
 
 * {

@@ -4,6 +4,7 @@ const THEMES = [
   { id: 'terminal', label: 'Терминал' },
   { id: 'pcb', label: 'Плата' },
   { id: 'retro', label: 'Ретро' },
+  { id: 'light', label: 'Светлая' },
 ]
 
 const STORAGE_KEY = 'constructor.theme'

@@ -12,7 +12,7 @@ export default function MainMenu({ onOpenLab, onOpenFree }) {
         <p>Интерактивные задания для изучения цифровой логики. Собирайте схемы, проверяйте их работу и закрепляйте знания на практике.</p>
         <div className="menu__downloads">
           <a className="btn btn--ghost" href="/docs/vse-laby.docx" download>
-            Скачать все лабы (Word)
+            Скачать все лабораторные работы (Word)
           </a>
           <a className="btn btn--ghost" href="/docs/shablon-otcheta.docx" download>
             Скачать шаблон отчёта
