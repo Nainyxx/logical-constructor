@@ -12,19 +12,19 @@
 
 ## Скачать
 
-⬇️ **[Актуальная сборка (zip)](https://github.com/Nainyxx/logical-constructor/releases/download/latest/logical-constructor.zip)**
+| Система | Файл |
+|---|---|
+| Windows | ⬇️ **[logical-constructor.exe](https://github.com/Nainyxx/logical-constructor/releases/download/latest/logical-constructor.exe)** |
+| Linux | ⬇️ [logical-constructor.AppImage](https://github.com/Nainyxx/logical-constructor/releases/download/latest/logical-constructor.AppImage) |
+| macOS | ⬇️ [logical-constructor.dmg](https://github.com/Nainyxx/logical-constructor/releases/download/latest/logical-constructor.dmg) |
 
-Сборка обновляется автоматически после каждого пуша в `main`.
-Чтобы запустить её, распакуйте архив и поднимите в этой папке любой статический сервер:
+Сборки обновляются автоматически после каждого пуша в `main`.
 
-```
-npx serve .
-# или
-python -m http.server
-```
-
-Затем откройте в браузере адрес, который выведет сервер. Если открыть `index.html`
-напрямую, без сервера, страница не запустится.
+- **Windows** — exe запускается сразу, установка не нужна. SmartScreen может
+  предупредить о неизвестном издателе: «Подробнее» → «Выполнить в любом случае».
+- **Linux** — сделайте файл исполняемым: `chmod +x logical-constructor.AppImage`.
+- **macOS** — приложение не подписано: при первом запуске откройте его через
+  правый клик → «Открыть».
 
 ## Сборка из исходников
 
@@ -32,13 +32,14 @@ python -m http.server
 cd cons-front
 npm install
 npm run dev     # режим разработки
-npm run build   # сборка в cons-front/dist/
+npm run build   # веб-сборка в cons-front/dist/
+npm run dist    # десктопное приложение для текущей ОС в cons-front/release/
 ```
 
 Подробнее об устройстве проекта — в [cons-front/README.md](cons-front/README.md).
 
 ## Структура репозитория
 
-- `cons-front/` — исходный код приложения (React + Vite);
+- `cons-front/` — исходный код приложения (React + Vite, десктоп — Electron);
 - `labas/` — методички к лабораторным работам;
 - `Диз/` — материалы по дизайну.
