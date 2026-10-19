@@ -1,0 +1,40 @@
+name: Build
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: cons-front
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: cons-front/package-lock.json
+
+      - run: npm ci
+      - run: npm run build
+
+      - name: Pack build
+        run: cd dist && zip -r ../logical-constructor.zip .
+
+      - name: Publish "latest" release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release delete latest --yes --cleanup-tag || true
+          gh release create latest logical-constructor.zip \
+            --title "Актуальная сборка" \
+            --notes "Автоматическая сборка из коммита ${GITHUB_SHA::7}." \
+            --target "$GITHUB_SHA"
