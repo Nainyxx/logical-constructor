@@ -22,6 +22,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     defaults:
       run:
+        shell: bash
         working-directory: cons-front
     steps:
       - uses: actions/checkout@v4
@@ -33,14 +34,17 @@ jobs:
           cache-dependency-path: cons-front/package-lock.json
 
       - run: npm ci
-      - run: npm run dist
+      - run: npx vite build
+      - run: npx electron-builder --publish never
         env:
           CSC_IDENTITY_AUTO_DISCOVERY: false
+      - run: ls -la release
 
       - uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.file }}
           path: cons-front/release/${{ matrix.file }}
+          if-no-files-found: error
 
   release:
     needs: build
