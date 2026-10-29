@@ -7,13 +7,32 @@ export default function MainMenu({ onOpenLab, onOpenFree }) {
   return (
     <div className="menu">
       <header className="menu__header">
+        <span className="menu__kicker">Программный комплекс по дисциплине «Схемотехника ЭВМ»</span>
         <h1>Лабораторные работы</h1>
         <p>Интерактивные задания для изучения цифровой логики. Собирайте схемы, проверяйте их работу и закрепляйте знания на практике.</p>
+        <div className="menu__downloads">
+          <a className="btn btn--ghost" href="/docs/vse-laby.docx" download>
+            Скачать все лабораторные работы (Word)
+          </a>
+          <a className="btn btn--ghost" href="/docs/shablon-otcheta.docx" download>
+            Скачать шаблон отчёта
+          </a>
+          <a className="btn btn--ghost" href="/docs/rukovodstvo-polzovatelya.docx" download>
+            Руководство пользователя
+          </a>
+        </div>
       </header>
 
       <section className="menu__grid">
         {LABS.map((lab) => (
-          <button key={lab.number} type="button" className="lab-card" onClick={() => onOpenLab(lab.number)}>
+          <div
+            key={lab.number}
+            className="lab-card"
+            role="button"
+            tabIndex={0}
+            onClick={() => onOpenLab(lab.number)}
+            onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && onOpenLab(lab.number)}
+          >
             <div className="lab-card__icon">
               {lab.reference
                 .filter((item) => item.gateId || item.box)
@@ -22,13 +41,24 @@ export default function MainMenu({ onOpenLab, onOpenFree }) {
                   <ReferenceGlyph key={item.term} item={item} scale={0.6} maxHeight={84} />
                 ))}
             </div>
-            <span className="lab-card__badge">Лабораторная работа №{lab.number}</span>
+            <div className="lab-card__top-row">
+              <span className="lab-card__badge">Лабораторная работа №{lab.number}</span>
+              <a
+                className="lab-card__download"
+                href={`/docs/lab-${lab.number}.docx`}
+                download
+                title="Скачать методичку (Word)"
+                onClick={(e) => e.stopPropagation()}
+              >
+                Методичка
+              </a>
+            </div>
             <h2>{lab.title}</h2>
             <p>{lab.goal}</p>
             <div className="lab-card__footer">
               <span className="lab-card__cta">Начать →</span>
             </div>
-          </button>
+          </div>
         ))}
 
         <button type="button" className="lab-card lab-card--free" onClick={onOpenFree}>
