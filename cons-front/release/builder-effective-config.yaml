@@ -1,0 +1,21 @@
+directories:
+  output: release
+  buildResources: build
+appId: com.nainyxx.logicalconstructor
+productName: Logical Constructor
+files:
+  - filter:
+      - dist/**
+      - electron/**
+win:
+  target: portable
+  artifactName: logical-constructor.exe
+linux:
+  target: AppImage
+  artifactName: logical-constructor.AppImage
+  category: Education
+mac:
+  target: dmg
+  artifactName: logical-constructor.dmg
+  category: public.app-category.education
+electronVersion: 44.9.0
