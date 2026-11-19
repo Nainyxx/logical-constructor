@@ -11,16 +11,22 @@ export default function MainMenu({ onOpenLab, onOpenFree }) {
         <h1>Лабораторные работы</h1>
         <p>Интерактивные задания для изучения цифровой логики. Собирайте схемы, проверяйте их работу и закрепляйте знания на практике.</p>
         <div className="menu__downloads">
-          <a className="btn btn--ghost" href="/docs/vse-laby.docx" download>
+          <a className="btn btn--ghost" href="./docs/vse-laby.docx" download>
             Скачать все лабораторные работы (Word)
           </a>
-          <a className="btn btn--ghost" href="/docs/shablon-otcheta.docx" download>
+          <a className="btn btn--ghost" href="./docs/shablon-otcheta.docx" download>
             Скачать шаблон отчёта
           </a>
-          <a className="btn btn--ghost" href="/docs/rukovodstvo-polzovatelya.docx" download>
+          <a className="btn btn--ghost" href="./docs/rukovodstvo-polzovatelya.docx" download>
             Руководство пользователя
           </a>
         </div>
+        <details className="menu__about">
+          <summary>О программе</summary>
+          <p><strong>Конструктор логических схем</strong> — тренажёр для лабораторных работ по цифровой логике.</p>
+          <p>Разработчик — Nainyxx</p>
+          <p>КНИТУ · 2026</p>
+        </details>
       </header>
 
       <section className="menu__grid">
@@ -31,7 +37,7 @@ export default function MainMenu({ onOpenLab, onOpenFree }) {
             role="button"
             tabIndex={0}
             onClick={() => onOpenLab(lab.number)}
-            onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && onOpenLab(lab.number)}
+            onKeyDown={(e) => e.target === e.currentTarget && (e.key === 'Enter' || e.key === ' ') && onOpenLab(lab.number)}
           >
             <div className="lab-card__icon">
               {lab.reference
@@ -45,7 +51,7 @@ export default function MainMenu({ onOpenLab, onOpenFree }) {
               <span className="lab-card__badge">Лабораторная работа №{lab.number}</span>
               <a
                 className="lab-card__download"
-                href={`/docs/lab-${lab.number}.docx`}
+                href={`./docs/lab-${lab.number}.docx`}
                 download
                 title="Скачать методичку (Word)"
                 onClick={(e) => e.stopPropagation()}

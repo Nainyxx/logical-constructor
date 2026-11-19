@@ -11,7 +11,7 @@ const MESSAGES = {
 export default function TruthTablePanel({ table }) {
   return (
     <section className="ttable">
-      <h3 className="ttable__title">Таблица истинности</h3>
+      <h3 className="ttable__title">{table.transition ? 'Таблица переходов RS-триггера' : 'Таблица истинности'}</h3>
       {table.status !== 'ok' ? (
         <p className="ttable__note">{MESSAGES[table.status]}</p>
       ) : (
@@ -29,6 +29,7 @@ export default function TruthTablePanel({ table }) {
                     <Name>{label || '—'}</Name>
                   </th>
                 ))}
+                {table.transition && <th>Комбинация</th>}
               </tr>
             </thead>
             <tbody>
@@ -42,6 +43,7 @@ export default function TruthTablePanel({ table }) {
                       {bit}
                     </td>
                   ))}
+                  {table.transition && <td>{row.forbidden ? 'Запрещена' : 'Допустима'}</td>}
                 </tr>
               ))}
             </tbody>

@@ -162,6 +162,20 @@ button {
   line-height: 1.55;
 }
 
+.menu__about {
+  margin-top: 16px;
+}
+
+.menu__about summary {
+  width: fit-content;
+  cursor: pointer;
+  color: var(--accent);
+}
+
+.menu__about[open] summary {
+  margin-bottom: 8px;
+}
+
 .menu__grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
@@ -308,6 +322,39 @@ button {
 .lab__title {
   margin: 0 auto 0 0;
   font-size: 17px;
+}
+
+.lab__topbar-actions,
+.task-indicators,
+.task-indicator {
+  display: flex;
+  align-items: center;
+}
+
+.lab__topbar-actions { gap: 16px; }
+.task-indicators { gap: 10px; }
+.task-indicator { gap: 4px; font: 600 13px var(--font-mono); }
+
+.task-indicator__light {
+  display: grid;
+  place-items: center;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: var(--danger);
+  color: #150808;
+  font-size: 12px;
+}
+
+.task-indicator.is-complete .task-indicator__light {
+  background: var(--live);
+  box-shadow: 0 0 5px var(--live-soft);
+  color: #06210e;
+}
+
+@media (max-width: 600px) {
+  .lab__topbar { flex-wrap: wrap; gap: 8px; }
+  .lab__topbar-actions { margin-left: auto; }
 }
 
 .lab__body {
