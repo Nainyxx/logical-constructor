@@ -5,7 +5,7 @@ import Port from './Port'
 import { getInputPortPosition, getNodeSize, getOutputPortPosition } from '../entities/layout'
 
 // элемент на холсте: тело + порты + подпись; жесты обрабатывает Workspace
-export default function ElementNode({ node, value, connectedInputs, connectedOutputs, onStartMove, onStartWire, onRemove, onRename }) {
+export default function ElementNode({ node, value, invalid, connectedInputs, connectedOutputs, onStartMove, onStartWire, onRemove, onRename }) {
   const { type } = node
   const size = getNodeSize(type)
   const outputs = value?.outputs ?? []
@@ -13,7 +13,7 @@ export default function ElementNode({ node, value, connectedInputs, connectedOut
 
   return (
     <div
-      className="node"
+      className={`node${invalid ? ' has-error' : ''}`}
       style={{ left: node.x, top: node.y, width: size.width, height: size.height }}
       onPointerDown={(e) => onStartMove(e, node)}
     >

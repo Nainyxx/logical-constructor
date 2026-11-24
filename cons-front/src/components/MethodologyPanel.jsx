@@ -81,6 +81,7 @@ export default function MethodologyPanel({ lab, activeTab, onSelectTab, onClose 
                           ))}
                         </ul>
                       )}
+                      {task.table && <RefTable table={task.table} />}
                     </div>
                   )}
                 </div>

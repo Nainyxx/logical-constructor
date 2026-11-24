@@ -127,6 +127,10 @@ export function useCircuitState(storageKey) {
   )
 
   return {
+    copyFrom(circuit) {
+      setNodes(circuit.nodes.map(({ type, ...node }) => ({ ...node, state: type.initialState?.() ?? null })))
+      setWires(circuit.wires.map(w => ({ ...w })))
+    },
     nodes: nodesWithType,
     wires,
     values,

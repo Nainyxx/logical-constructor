@@ -163,8 +163,25 @@ button {
 }
 
 .menu__about {
-  margin-top: 16px;
+  margin: 0 0 16px;
 }
+
+.menu__about h2 { font-size: 15px; margin: 10px 0 4px; }
+.menu__about ul { padding-left: 20px; margin: 0; columns: 2; max-width: 360px; }
+
+.task-review {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 14px;
+  padding: 8px 14px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
+  font-size: 13px;
+}
+.task-review span { flex: 1 1 160px; }
+.node.has-error { outline: 2px dashed var(--danger); outline-offset: 3px; }
+.screenshot-message { font-size: 12px; color: var(--ink); }
 
 .menu__about summary {
   width: fit-content;
@@ -897,6 +914,8 @@ button {
   stroke: var(--live);
   stroke-width: 2;
 }
+
+.wire-visible.has-error { stroke: var(--danger); stroke-width: 3; stroke-dasharray: 6 3; }
 
 .wire--draft {
   stroke: var(--accent);

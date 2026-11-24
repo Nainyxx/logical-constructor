@@ -5,7 +5,7 @@ import { assignTrunks, pathMidpoint, pointsToPath, routePoints } from '../entiti
 // hit-path поверх, чтобы легче попадать курсором. Точка-узел — на ветвлении.
 // Клик по hit-path удаляет провод; зажать-и-потянуть — новое ответвление от
 // того же источника (см. Workspace.jsx: 'wire-branch-pending' -> 'wire').
-export default function WireLayer({ nodes, wires, values, draftWire, onWirePointerDown }) {
+export default function WireLayer({ nodes, wires, values, draftWire, onWirePointerDown, errorIds }) {
   const nodeById = new Map(nodes.map((node) => [node.id, node]))
 
   function outputPoint(nodeId, portIndex = 0) {
@@ -64,7 +64,7 @@ export default function WireLayer({ nodes, wires, values, draftWire, onWirePoint
                 onWirePointerDown(wire, points, e)
               }}
             />
-            <path d={d} className={`wire-visible ${live ? 'is-live' : ''}`} />
+            <path d={d} className={`wire-visible ${live ? 'is-live' : ''} ${errorIds?.includes(wire.id) ? 'has-error' : ''}`} />
             <g className="wire-marker" transform={`translate(${mid.x}, ${mid.y})`}>
               <circle r="8" />
               <path d="M -3 -3 L 3 3 M 3 -3 L -3 3" />

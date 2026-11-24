@@ -1,14 +1,12 @@
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import LibraryPanel from './LibraryPanel'
 import Workspace from './Workspace'
 import MethodologyPanel from './MethodologyPanel'
 import { useCircuitState } from '../hooks/useCircuitState'
 import { getLab } from '../entities/labs'
-import { isTaskComplete } from '../entities/taskCompletion'
+import { useTaskReview } from '../hooks/useTaskReview'
 
-function TaskIndicator({ task, number, circuit }) {
-  const { nodes, wires } = circuit
-  const done = useMemo(() => isTaskComplete(task.check, nodes, wires), [task.check, nodes, wires])
+function TaskIndicator({ task, number, done }) {
   const status = `${task.title} — ${done ? 'выполнено' : 'ещё не выполнено'}`
   return (
     <span className={`task-indicator${done ? ' is-complete' : ''}`} title={status} role="img" aria-label={status}>
@@ -29,6 +27,12 @@ export default function LabWorkspace({ number, onBack }) {
   const task2 = useCircuitState(`lab:${lab.number}:2`)
   const circuits = [task0, task1, task2]
   const activeCircuit = circuits[activeTab]
+  const reviews = [
+    useTaskReview(lab.tasks[0].check, task0),
+    useTaskReview(lab.tasks[1].check, task1),
+    useTaskReview(lab.tasks[2].check, task2),
+  ]
+  const { review, verify } = reviews[activeTab]
 
   return (
     <div className="lab">
@@ -40,7 +44,7 @@ export default function LabWorkspace({ number, onBack }) {
         <div className="lab__topbar-actions">
           <div className="task-indicators" role="group" aria-label="Выполнение заданий">
             {lab.tasks.map((task, i) => (
-              <TaskIndicator key={task.check} task={task} number={i + 1} circuit={circuits[i]} />
+              <TaskIndicator key={task.check} task={task} number={i + 1} done={reviews[i].review?.done} />
             ))}
           </div>
           <button
@@ -71,7 +75,18 @@ export default function LabWorkspace({ number, onBack }) {
             ))}
           </div>
 
-          <Workspace key={activeTab} {...activeCircuit} />
+          <div className="task-review">
+            {lab.cumulative && activeTab > 0 && !activeCircuit.nodes.length && circuits[activeTab - 1].nodes.length > 0 && (
+              <button type="button" className="btn btn--ghost" onClick={() => activeCircuit.copyFrom(circuits[activeTab - 1])}>
+                Взять схему задания {activeTab}
+              </button>
+            )}
+            <button type="button" className="btn btn--ghost" onClick={verify}>Проверить выполнение задания</button>
+            <span role="status">{review && (review.done ? 'Задание выполнено.' : review.error.message)}</span>
+          </div>
+          <Workspace key={activeTab} {...activeCircuit} error={review?.error}
+            reportTitle={`Лабораторная работа №${number} · Задание ${activeTab + 1}`}
+            reportIndicators={reviews.map(r => Boolean(r.review?.done))} />
         </div>
 
         {showMethodology && (

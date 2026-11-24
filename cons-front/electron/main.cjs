@@ -4,7 +4,7 @@ const { copyFile } = require('node:fs/promises')
 const path = require('node:path')
 
 ipcMain.handle('save-document', async (event, filename) => {
-  if (typeof filename !== 'string' || !/^(?:lab-[1-5]|vse-laby|shablon-otcheta|rukovodstvo-polzovatelya)\.docx$/.test(filename)) return
+  if (typeof filename !== 'string' || !/^(?:lab-[1-6]|vse-laby|shablon-otcheta|rukovodstvo-polzovatelya)\.docx$/.test(filename)) return
   const win = BrowserWindow.fromWebContents(event.sender)
   try {
     const result = await dialog.showSaveDialog(win, {

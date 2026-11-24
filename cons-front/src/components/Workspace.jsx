@@ -6,6 +6,7 @@ import { ELEMENT_TYPES } from '../entities/elementTypes'
 import { WORLD_SIZE, getNodeSize, snap } from '../entities/layout'
 import { buildCircuitTable } from '../entities/truthTable'
 import { nearestPointOnPath } from '../entities/wireRouting'
+import { ScreenshotButton } from './ScreenshotButton'
 
 const MIN_SCALE = 0.4
 const MAX_SCALE = 2.5
@@ -27,6 +28,9 @@ export default function Workspace({
   clear,
   emptyHint = 'Перетащите элементы из библиотеки на поле и соедините их проводниками',
   tableOpenByDefault = false,
+  error,
+  reportTitle = 'Свободный режим',
+  reportIndicators = [],
 }) {
   const containerRef = useRef(null)
   const interactionRef = useRef(null)
@@ -280,7 +284,7 @@ export default function Workspace({
       ? { text: 'Разместите элементы', ready: false }
       : freeInputs > 0
         ? { text: `Не подключено входов: ${freeInputs}`, ready: false }
-        : { text: 'Все соединения корректны', ready: true }
+        : { text: 'Все входы подключены', ready: true }
 
   return (
     <div className="workspace-shell">
@@ -305,6 +309,7 @@ export default function Workspace({
           <div className="workspace__grid" style={{ width: WORLD_SIZE, height: WORLD_SIZE }} />
 
           <WireLayer
+            errorIds={error?.wireIds}
             nodes={nodes}
             wires={wires}
             values={values}
@@ -314,6 +319,7 @@ export default function Workspace({
 
           {nodes.map((node) => (
             <ElementNode
+              invalid={error?.nodeIds.includes(node.id)}
               key={node.id}
               node={node}
               value={values.get(node.id)}
@@ -338,6 +344,7 @@ export default function Workspace({
       {showTable && <TruthTablePanel table={table} />}
 
       <div className="workspace__toolbar">
+        <ScreenshotButton workspace={containerRef} title={reportTitle} indicators={reportIndicators} />
         <div className="workspace__zoom">
           <button type="button" title="Уменьшить" onClick={() => zoomBy(1 / 1.25)}>
             −

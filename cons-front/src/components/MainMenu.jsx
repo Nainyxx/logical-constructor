@@ -2,11 +2,18 @@ import ReferenceGlyph from './ReferenceGlyph'
 import { FULL_PALETTE_IDS } from '../entities/elementTypes'
 import { LABS } from '../entities/labs'
 
-// каталог: пять лаб + свободный режим, на карточках — значки изучаемых узлов
+// Каталог лабораторных и свободный режим. На карточках — значки изучаемых узлов.
 export default function MainMenu({ onOpenLab, onOpenFree }) {
   return (
     <div className="menu">
       <header className="menu__header">
+        <details className="menu__about">
+          <summary>Справка о программе</summary>
+          <p><strong>Конструктор логических схем</strong> — тренажёр для лабораторных работ по цифровой логике.</p>
+          <p>КНИТУ · 2026</p>
+          <h2>Авторы</h2>
+          <ul>{Array.from({ length: 8 }, (_, i) => <li key={i}>Автор {i + 1}</li>)}</ul>
+        </details>
         <span className="menu__kicker">Программный комплекс по дисциплине «Схемотехника ЭВМ»</span>
         <h1>Лабораторные работы</h1>
         <p>Интерактивные задания для изучения цифровой логики. Собирайте схемы, проверяйте их работу и закрепляйте знания на практике.</p>
@@ -21,12 +28,6 @@ export default function MainMenu({ onOpenLab, onOpenFree }) {
             Руководство пользователя
           </a>
         </div>
-        <details className="menu__about">
-          <summary>О программе</summary>
-          <p><strong>Конструктор логических схем</strong> — тренажёр для лабораторных работ по цифровой логике.</p>
-          <p>Разработчик — Nainyxx</p>
-          <p>КНИТУ · 2026</p>
-        </details>
       </header>
 
       <section className="menu__grid">
